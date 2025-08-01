@@ -1,5 +1,7 @@
 -- INPUT SQL TABLE HERE --
 -- REMBMBER TO PULL CHANGES BEFORE MAKING CHANGES HERE, THEN COMMIT & PUSH AFTER CHANGES --
+DROP DATABASE finance_db;
+
 CREATE DATABASE finance_db;
 USE finance_db;
 
@@ -26,8 +28,7 @@ INSERT INTO stocks (symbol, company_name, sector) VALUES
 ('JPM', 'JPMorgan Chase & Co.', 'Financial'),
 ('NFLX', 'Netflix, Inc.', 'Communication Services'),
 ('NVDA', 'NVIDIA Corporation', 'Technology'),
-('PFE', 'Pfizer Inc.', 'Healthcare'),
-('KO', 'The Coca-Cola Company', 'Consumer Staples');
+('PFE', 'Pfizer Inc.', 'Healthcare');
 INSERT INTO portfolio (stock_id, quantity, avg_price, last_updated) VALUES
 (1, 50.00, 145.20, '2025-07-15 10:23:00'),
 (2, 10.00, 2800.00, '2025-07-14 09:10:00'),
@@ -38,4 +39,29 @@ INSERT INTO portfolio (stock_id, quantity, avg_price, last_updated) VALUES
 (7, 7.00, 590.25, '2025-07-09 10:00:00'),
 (8, 15.00, 850.00, '2025-07-11 17:50:00'),
 (9, 80.00, 39.90, '2025-07-08 13:37:00'),
-(10, 60.00, 58.70, '2025-07-05 12:25:00');
+
+
+-- FORMAT FOR CREATING STORED PROCEEDURE --
+USE stocks_sproc
+DELIMITER //
+CREATE PROCEDURE stocks_sproc
+(	symbol VARCHAR(20),
+	company_name VARCHAR(100),
+    sector VARCHAR(50))
+BEGIN
+	INSERT INTO stocks
+    (symbol, company_name, sector)
+    VALUES
+    (symbol, company_name, sector);
+END//
+DELIMITER ;
+
+		-- HOW TO USE THE STORED PROCEEDURE TO ENTER DATA --
+CALL stocks_sproc('KO', 'The Coca-Cola Company', 'Consumer Staples');
+
+-- VIEWING THE TABLE
+SELECT * FROM stocks;
+
+
+
+
