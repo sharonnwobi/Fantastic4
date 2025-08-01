@@ -1,18 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>{{ stock_info['shortName'] }} info</title>
-    <link rel="stylesheet" href="static/styles.css">
+  <meta charset="UTF-8">
+  <title>Stock List</title>
+  <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-    <div class="container">
-        <h1>{{ stock_info['shortName'] }} ({{ stock_info['symbol'] }})</h1>
-        <p><strong>Current Price:</strong> {{ stock_info['currentPrice'] }}</p>
-        <p><strong>Market Cap:</strong> {{ stock_info['marketCap'] }}</p>
-        <p><strong>Sector:</strong> {{ stock_info['sector'] }}</p>
-        <p><strong>Country:</strong> {{ stock_info['country'] }}</p>
-        <p><strong>Description:</strong> {{ stock_info['longBusinessSummary'][:300] }}...</p>
-    </div>
+  <h1>Available Stocks</h1>
+  <table>
+    <thead>
+      <tr><th>ID</th><th>Symbol</th><th>Name</th><th>Sector</th></tr>
+    </thead>
+    <tbody>
+      {% for stock in stocks %}
+        <tr>
+          <td>{{ stock[0] }}</td>
+          <td>{{ stock[1] }}</td>
+          <td>{{ stock[2] }}</td>
+          <td>{{ stock[3] }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </body>
 </html>

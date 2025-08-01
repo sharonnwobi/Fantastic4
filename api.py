@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from flask_restful import Api, Resource
 from database.connection import connect_to_database
 
-app = Flask(__name__)
+app = Flask("api")
 api = Api(app)
 
 class Stocks(Resource):
@@ -14,7 +14,7 @@ class Stocks(Resource):
         cursor.close()
         return jsonify(stocks)
 
-api.add_resource(Stocks, '/stocks')
+api.add_resource(Stocks, '/api/stocks')
 
 if __name__ == '__main__':
     app.run(debug=True)
