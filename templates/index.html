@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ stock_info['shortName'] }} info</title>
+    <link rel="stylesheet" href="static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>{{ stock_info['shortName'] }} ({{ stock_info['symbol'] }})</h1>
+        <p><strong>Current Price:</strong> {{ stock_info['currentPrice'] }}</p>
+        <p><strong>Market Cap:</strong> {{ stock_info['marketCap'] }}</p>
+        <p><strong>Sector:</strong> {{ stock_info['sector'] }}</p>
+        <p><strong>Country:</strong> {{ stock_info['country'] }}</p>
+        <p><strong>Description:</strong> {{ stock_info['longBusinessSummary'][:300] }}...</p>
+    </div>
+</body>
+</html>
