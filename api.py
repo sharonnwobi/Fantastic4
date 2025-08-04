@@ -8,7 +8,7 @@ api = Api(app)
 class Stocks(Resource):
     def get(self):
         db = connect_to_database()
-        cursor = db.cursor()
+        cursor = db.cursor(dictionary=True) #using dictonary
         cursor.execute("SELECT * FROM stocks")
         stocks = cursor.fetchall()
         cursor.close()
