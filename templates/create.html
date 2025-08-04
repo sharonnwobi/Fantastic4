@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}Add New Stock{% endblock %}
+
+{% block content %}
+<h2>Add New Stock</h2>
+<form action="/stocks/create" method="post">
+  <label>Symbol: <input type="text" name="symbol" required></label><br>
+  <label>Company Name: <input type="text" name="company_name" required></label><br>
+  <label>Sector: <input type="text" name="sector"></label><br>
+  <button type="submit">Add Stock</button>
+</form>
+{% endblock %}

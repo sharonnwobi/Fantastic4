@@ -1,26 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Stock List</title>
-  <link rel="stylesheet" href="/static/styles.css">
-</head>
-<body>
-  <h1>Available Stocks</h1>
-  <table>
-    <thead>
-      <tr><th>ID</th><th>Symbol</th><th>Name</th><th>Sector</th></tr>
-    </thead>
-    <tbody>
-      {% for stock in stocks %}
-        <tr>
-          <td>{{ stock[0] }}</td>
-          <td>{{ stock[1] }}</td>
-          <td>{{ stock[2] }}</td>
-          <td>{{ stock[3] }}</td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Stock List{% endblock %}
+
+{% block content %}
+<h2>Available Stocks</h2>
+<table>
+  <thead>
+    <tr>
+      <!--<th>ID</th>-->
+      <th>Symbol</th>
+      <th>Name</th>
+      <th>Sector</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for stock in stocks %}
+    <tr>
+      <!--<td>{{ stock.stock_id }}</td>-->
+      <td>{{ stock.symbol }}</td>
+      <td>{{ stock.company_name }}</td>
+      <td>{{ stock.sector }}</td>
+      <td>
+        <a href="/stocks/edit/{{ stock.stock_id }}">Edit</a> |
+        <a href="/stocks/delete/{{ stock.stock_id }}" onclick="return confirm('Are you sure?')">Delete</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
