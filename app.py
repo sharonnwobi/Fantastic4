@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect
 import requests
 from database.connection import connect_to_database
+from helpers.yfinance_lookup import get_top_stock_info
 
 app = Flask(__name__)
 
@@ -25,7 +26,10 @@ def create_stock():
         db.commit()
         cursor.close()
         return redirect("/stocks")
-    return render_template("create.html")
+    
+    stock_options = get_top_stock_info()
+    return render_template("create.html", stock_options=stock_options)
+
 
 @app.route("/stocks/edit/<int:stock_id>", methods=["GET", "POST"])
 def edit_stock(stock_id):
