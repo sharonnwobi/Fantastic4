@@ -62,6 +62,18 @@ def delete_stock(stock_id):
     cursor.close()
     return redirect("/stocks")
 
+@app.route("/stocks/<symbol>")
+def stock_overview(symbol):
+    response = requests.get("http://localhost:5000/api/stocks/" + symbol)
+    if response.status_code != 200:
+        print(response.text)
+        return "Error fetching stock data", 500
+    data = response.json()
+    info = data.get("info", {})
+    timestamps = data.get("timestamps", [])
+    prices = data.get("prices", [])
+
+    return render_template("overview.html", info=info, timestamps=timestamps, prices=prices)
 
 if __name__ == "__main__":
     app.run(debug=True, port=5001)
