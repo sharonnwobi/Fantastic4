@@ -19,8 +19,14 @@ def get_stock_data(ticker, period="5d"): #to be changed to user input from front
     typical_price = (data['High'] + data['Low'] + data['Close']) / 3
     average_price = (typical_price * volume).cumsum() / volume.cumsum()
 
-    return times.tolist(), average_price.tolist()
+    graph_data = {
+        "times": times.tolist(),
+        "average_price": average_price.tolist()
+    }
 
-#print(get_stock_data("AMZN"))
+    return ticker, graph_data
+
+
+
 
 
