@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}{{ info['longName'] }} Overview{% endblock %}
+
+{% block content %}
+<h2>{{ info['longName'] }} ({{ info['symbol'] }})</h2>
+<p>Sector: {{ info['sector'] }} | Country: {{ info['country'] }}</p>
+<p>Current Price: <strong>{{ info['currentPrice'] }}</strong></p>
+<span style="display:none" id="timestamps">{{ timestamps | tojson }}</span>
+<span style="display:none" id="prices">{{ prices | tojson }}</span>
+<canvas id="priceChart" width="800" height="400"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const timestampsData = JSON.parse(document.getElementById('timestamps').textContent);
+const pricesData = JSON.parse(document.getElementById('prices').textContent);
+
+const ctx = document.getElementById('priceChart').getContext('2d');
+const chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: timestampsData,
+        datasets: [{
+            label: 'Price (USD)',
+            data: pricesData,
+            borderColor: '#3498db',
+            backgroundColor: 'rgba(52, 152, 219, 0.1)'
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            x: { title: { display: true, text: 'Time' }},
+            y: { title: { display: true, text: 'Price (USD)' }}
+        }
+    }
+});
+</script>
+
+{% endblock %}

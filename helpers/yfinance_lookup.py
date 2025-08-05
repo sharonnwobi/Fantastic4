@@ -25,3 +25,18 @@ def get_top_stock_info():
                 "sector": "Unknown"
             })
     return results
+
+def get_stock_info(symbol):
+    stock = yf.Ticker(symbol)
+
+    try:
+        info = stock.info
+        history = stock.history(period="1d", interval="5m")
+    except Exception as e:
+        return f"Error fetching stock data: {e}", 500
+
+    timestamps = history.index.strftime('%H:%M').tolist()
+    prices = history["Close"].fillna(method="ffill").tolist()
+    
+    return timestamps, prices, info
+    
