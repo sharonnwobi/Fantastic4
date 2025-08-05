@@ -17,7 +17,7 @@ CREATE TABLE portfolio (
     quantity DECIMAL(12, 2) NOT NULL,
     avg_price DECIMAL(10, 2) NOT NULL,
     last_updated DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (stock_id) REFERENCES stocks(stock_id)
+    FOREIGN KEY (stock_id) REFERENCES stocks(stock_id) ON DELETE CASCADE
 );
 INSERT INTO stocks (symbol, company_name, sector) VALUES
 ('AAPL', 'Apple Inc.', 'Technology'),

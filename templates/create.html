@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Add New Stock{% endblock %}
+
+{% block content %}
+<h2>Add New Stock</h2>
+<form action="/stocks/create" method="post">
+  <label>Select Stock:</label>
+  <select name="symbol" required onchange="fillFields(this)">
+    <option value="" disabled selected>Select one</option>
+    {% for stock in stock_options %}
+      <option value="{{ stock.symbol }}"
+              data-name="{{ stock.company_name }}"
+              data-sector="{{ stock.sector }}">{{ stock.symbol }} - {{ stock.company_name }}</option>
+    {% endfor %}
+  </select><br><br>
+
+  <label>Company Name: <input type="text" name="company_name" id="company_name" required></label><br>
+  <label>Sector: <input type="text" name="sector" id="sector"></label><br>
+
+  <button type="submit">Add Stock</button>
+</form>
+
+<script>
+  function fillFields(select) {
+    const selected = select.options[select.selectedIndex];
+    document.getElementById("company_name").value = selected.dataset.name;
+    document.getElementById("sector").value = selected.dataset.sector;
+  }
+</script>
+
+{% endblock %}
