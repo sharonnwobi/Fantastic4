@@ -1,6 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Add New Stock{% endblock %}
+
+{% block content %}
 <h2>Add New Stock</h2>
 <form action="/stocks/create" method="post">
-  <label>Select Stock:</label><br>
+  <label>Select Stock:</label>
   <select name="symbol" required onchange="fillFields(this)">
     <option value="" disabled selected>Select one</option>
     {% for stock in stock_options %}
@@ -23,3 +27,5 @@
     document.getElementById("sector").value = selected.dataset.sector;
   }
 </script>
+
+{% endblock %}

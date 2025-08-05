@@ -1,13 +1,18 @@
 {% extends "base.html" %}
-
 {% block title %}Edit Stock{% endblock %}
 
 {% block content %}
 <h2>Edit Stock</h2>
 <form action="/stocks/edit/{{ stock.stock_id }}" method="post">
-  <label>Symbol: <input type="text" name="symbol" value="{{ stock.symbol }}" required></label><br>
-  <label>Company Name: <input type="text" name="company_name" value="{{ stock.company_name }}" required></label><br>
-  <label>Sector: <input type="text" name="sector" value="{{ stock.sector }}"></label><br>
+  <label>Symbol:
+    <input type="text" name="symbol" value="{{ stock.symbol }}" required>
+  </label>
+  <label>Company Name:
+    <input type="text" name="company_name" value="{{ stock.company_name }}" required>
+  </label>
+  <label>Sector:
+    <input type="text" name="sector" value="{{ stock.sector }}">
+  </label>
   <button type="submit">Update Stock</button>
 </form>
 {% endblock %}

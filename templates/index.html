@@ -1,13 +1,11 @@
 {% extends "base.html" %}
-
 {% block title %}Stock List{% endblock %}
 
 {% block content %}
 <h2>Available Stocks</h2>
-<table>
+<table class="stock-table">
   <thead>
     <tr>
-      <!--<th>ID</th>-->
       <th>Symbol</th>
       <th>Name</th>
       <th>Sector</th>
@@ -17,12 +15,11 @@
   <tbody>
     {% for stock in stocks %}
     <tr>
-      <!--<td>{{ stock.stock_id }}</td>-->
       <td>{{ stock.symbol }}</td>
       <td>{{ stock.company_name }}</td>
       <td>{{ stock.sector }}</td>
-      <td>
-        <a href="/stocks/edit/{{ stock.stock_id }}">Edit</a> |
+      <td class="actions">
+        <a href="/stocks/edit/{{ stock.stock_id }}">Edit</a>
         <a href="/stocks/delete/{{ stock.stock_id }}" onclick="return confirm('Are you sure?')">Delete</a>
       </td>
     </tr>
