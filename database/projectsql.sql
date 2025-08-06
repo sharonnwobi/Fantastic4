@@ -11,37 +11,35 @@ CREATE TABLE stocks (
     company_name VARCHAR(100) NOT NULL,
     sector VARCHAR(50)
 );
-CREATE TABLE portfolio (
-    portfolio_id INT PRIMARY KEY AUTO_INCREMENT,
-    stock_id INT NOT NULL,
+ALTER TABLE stocks AUTO_INCREMENT=1000;
+
+CREATE TABLE transactions (
+    -- portfolio_id INT PRIMARY KEY AUTO_INCREMENT,-- is a portfolio_id needed if we are only having unique stock id?
+    -- upon entry, logic dhould check if user holds a stock in porfolio, if yes, then a row modification is made based on stock_id
+    -- IF NO, then a new row is entered: use SYMBOL from user input to find mathcung stock_id on stocks table, then insert into portolo with relevant quantities.
+    -- Note: if adding new row, only two fields are needed in logic, call stored proceedure
+    
+    stock_id INT PRIMARY KEY,
+    price DOUBLE NOT NULL,
     quantity DECIMAL(12, 2) NOT NULL,
-    avg_price DECIMAL(10, 2) NOT NULL,
-    last_updated DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (stock_id) REFERENCES stocks(stock_id) ON DELETE CASCADE
+    transaction_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    FOREIGN KEY (stock_id) REFERENCES stocks(stock_id) 
+   
 );
-INSERT INTO stocks (symbol, company_name, sector) VALUES
-('AAPL', 'Apple Inc.', 'Technology'),
-('GOOGL', 'Alphabet Inc.', 'Technology'),
-('AMZN', 'Amazon.com, Inc.', 'Consumer Discretionary'),
-('TSLA', 'Tesla, Inc.', 'Automotive'),
-('MSFT', 'Microsoft Corporation', 'Technology'),
-('JPM', 'JPMorgan Chase & Co.', 'Financial'),
-('NFLX', 'Netflix, Inc.', 'Communication Services'),
-('NVDA', 'NVIDIA Corporation', 'Technology'),
-('PFE', 'Pfizer Inc.', 'Healthcare');
-INSERT INTO portfolio (stock_id, quantity, avg_price, last_updated) VALUES
-(1, 50.00, 145.20, '2025-07-15 10:23:00'),
-(2, 10.00, 2800.00, '2025-07-14 09:10:00'),
-(3, 5.00, 3450.50, '2025-07-16 14:30:00'),
-(4, 12.00, 720.00, '2025-07-12 08:00:00'),
-(5, 20.00, 299.99, '2025-07-13 11:45:00'),
-(6, 100.00, 165.00, '2025-07-10 16:12:00'),
-(7, 7.00, 590.25, '2025-07-09 10:00:00'),
-(8, 15.00, 850.00, '2025-07-11 17:50:00'),
-(9, 80.00, 39.90, '2025-07-08 13:37:00'),
+
+CREATE TABLE portfolio_history(
+-- history_id INT PRIMARY KEY AUTO_INCREMENT,
+symbol VARCHAR(50),
+avg_price DOUBLE,
+timestamp_hist DATETIME
+FOREIGN KEY (symbol) REFERENCES stocks(symbol) ON DELETE CASCADE
+ -- Create trigger to auto remove history based on portfolio: link histtory to portfolio
+
+)
 
 
--- FORMAT FOR CREATING STORED PROCEEDURE --
+
+-- STORED PROCEEDURE for stocks --
 USE stocks_sproc
 DELIMITER //
 CREATE PROCEDURE stocks_sproc
@@ -54,13 +52,66 @@ BEGIN
     VALUES
     (symbol, company_name, sector);
 END//
-DELIMITER ;
+DELIMITER;
 
-		-- HOW TO USE THE STORED PROCEEDURE TO ENTER DATA --
+
+-- STORED PROCEEDURE for transactions --
+USE transaction_sproc
+DELIMITER //
+CREATE PROCEDURE transaction_sproc
+	(
+	stock_id INT,
+    price DOUBLE,
+	quantity DECIMAL(12, 2))
+BEGIN
+	INSERT INTO portfolio
+    (stock_id, price, quantity)
+    VALUES
+    (stock_id, price, quantity);
+END//
+DELIMITER ;
+-- TO ENTER DATA WRITE QUERY:   CALL portfolio_stocks(1001, 50);
+
+
+-- STORED PROCEEDURE for historytable --
+USE history_sproc
+DELIMITER //
+CREATE PROCEDURE history_sproc
+	(
+	symbol VARCHAR(250),
+	avg_price DOUBLE)
+BEGIN
+	INSERT INTO portfolio_history
+    (symbol, avg_price)
+    VALUES
+    (symbol, avg_price);
+END//
+DELIMITER ;
+-- TO ENTER DATA WRITE: CALL history_sproc(APPL, 20.49)
+
+
+
+
+
+		-- POPULATING STOCKS AND PORTFOLIO TABLES, history needs live data.
+
+CALL stocks_sproc('AAPL', 'Apple Inc.', 'Technology');
+CALL stocks_sproc('GOOGL', 'Alphabet Inc.', 'Technology');
+CALL stocks_sproc('AMZN', 'Amazon.com, Inc.', 'Consumer Discretionary');
+CALL stocks_sproc('TSLA', 'Tesla, Inc.', 'Automotive');
+CALL stocks_sproc('MSFT', 'Microsoft Corporation', 'Technology');
+CALL stocks_sproc('JPM', 'JPMorgan Chase & Co.', 'Financial');
+CALL stocks_sproc('NFLX', 'Netflix, Inc.', 'Communication Services');
+CALL stocks_sproc('NVDA', 'NVIDIA Corporation', 'Technology');
+CALL stocks_sproc('PFE', 'Pfizer Inc.', 'Healthcare');
 CALL stocks_sproc('KO', 'The Coca-Cola Company', 'Consumer Staples');
 
--- VIEWING THE TABLE
+
 SELECT * FROM stocks;
+
+
+
+
 
 
 
