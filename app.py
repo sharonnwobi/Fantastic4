@@ -22,7 +22,7 @@ def create_stock():
 
         payload = {"stock_id": stock_id, "price": price, "quantity": quantity}
 
-        response = requests.post("http://localhost:5000/api/stocks", json=payload)
+        requests.post("http://localhost:5000/api/transactions", json=payload)
         return redirect("/stocks")
 
     stock_options = requests.get("http://localhost:5000/api/stocks")

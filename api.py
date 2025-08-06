@@ -32,12 +32,14 @@ class Transactions(Resource):
     def post(self):
         data = request.get_json()
 
-        db = connect_to_database()
-        cursor = db.cursor()
-        cursor.execute( "CALL transactions_sproc (%s, %s, %s)", (data["stock_id"], data["price"], data["quantity"]))
-        db.commit()
-        cursor.close()
-        return jsonify({"status": "success"}), 201
+        try:
+            db = connect_to_database()
+            cursor = db.cursor()
+            cursor.execute( "CALL transactions_sproc (%s, %s, %s)", (data["stock_id"], data["price"], data["quantity"]))
+            db.commit()
+            cursor.close()
+        except Exception as e:
+            print(f"Error: {e}")
 
 
 
