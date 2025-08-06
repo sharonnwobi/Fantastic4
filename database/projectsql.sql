@@ -69,7 +69,7 @@ BEGIN
     (stock_id, price, quantity);
 END//
 DELIMITER ;
--- TO ENTER DATA WRITE QUERY:   CALL portfolio_stocks(1001, 50);
+-- TO ENTER DATA WRITE QUERY:   CALL transactoions_sproc(1001, 50, 10);
 
 
 -- STORED PROCEEDURE for historytable --

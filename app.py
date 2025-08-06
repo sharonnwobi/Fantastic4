@@ -15,22 +15,18 @@ def show_stocks():
 @app.route("/stocks/create", methods=["GET", "POST"])
 def create_stock():
     if request.method == "POST":
+
+        stock_id = request.form.get("stock_id")
+        price = request.form.get("price")
         quantity = request.form["quantity"]
-        price = request.form["price"]
-        stock_id = request.form["stock_id"]
-        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        db = connect_to_database()
-        cursor = db.cursor()
-        cursor.execute(
-            "INSERT INTO transactions (stock_id, price, quantity, transaction_date) VALUES (%s, %s, %s, %s)",
-            (stock_id, price, quantity, now)
-        )
-        db.commit()
-        cursor.close()
+
+        payload = {"stock_id": stock_id, "price": price, "quantity": quantity}
+
+        response = requests.post("http://localhost:5000/api/stocks", json=payload)
         return redirect("/stocks")
-    
+
     stock_options = requests.get("http://localhost:5000/api/stocks")
-    # append to stock_options to include current price that we get from get_stock_current_price() method
+
     stock_options = stock_options.json()
     for stock in stock_options:
         stock["current_price"] = get_stock_current_price(stock["symbol"])
@@ -57,16 +53,16 @@ def edit_stock(stock_id):
         stock = cursor.fetchone()
         cursor.close()
         return render_template("edit.html", stock=stock)
-@app.route("/stocks/delete/<int:stock_id>")
-def delete_stock(stock_id):
-    db = connect_to_database()
-    cursor = db.cursor()
-    #Dont have to do it after the new db /cascade on portfolio/
-    cursor.execute("DELETE FROM portfolio WHERE stock_id = %s", (stock_id,))
-    cursor.execute("DELETE FROM stocks WHERE stock_id = %s", (stock_id,))
-    db.commit()
-    cursor.close()
-    return redirect("/stocks")
+# @app.route("/stocks/delete/<int:stock_id>")
+# def delete_stock(stock_id):
+#     db = connect_to_database()
+#     cursor = db.cursor()
+#     #Dont have to do it after the new db /cascade on portfolio/
+#     cursor.execute("DELETE FROM portfolio WHERE stock_id = %s", (stock_id,))
+#     cursor.execute("DELETE FROM stocks WHERE stock_id = %s", (stock_id,))
+#     db.commit()
+#     cursor.close()
+#     return redirect("/stocks")
 
 @app.route("/stocks/<symbol>")
 def stock_overview(symbol):
