@@ -1,7 +1,8 @@
 from flask import Flask, render_template, request, redirect
 import requests
 from database.connection import connect_to_database
-from helpers.yfinance_lookup import get_top_stock_info
+from datetime import datetime
+from helpers.yfinance_lookup import get_stock_current_price
 
 app = Flask(__name__)
 
@@ -14,20 +15,25 @@ def show_stocks():
 @app.route("/stocks/create", methods=["GET", "POST"])
 def create_stock():
     if request.method == "POST":
-        symbol = request.form["symbol"]
-        name = request.form["company_name"]
-        sector = request.form["sector"]
+        quantity = request.form["quantity"]
+        price = request.form["price"]
+        stock_id = request.form["stock_id"]
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         db = connect_to_database()
         cursor = db.cursor()
         cursor.execute(
-            "INSERT INTO stocks (symbol, company_name, sector) VALUES (%s, %s, %s)",
-            (symbol, name, sector)
+            "INSERT INTO transactions (stock_id, price, quantity, transaction_date) VALUES (%s, %s, %s, %s)",
+            (stock_id, price, quantity, now)
         )
         db.commit()
         cursor.close()
         return redirect("/stocks")
     
-    stock_options = get_top_stock_info()
+    stock_options = requests.get("http://localhost:5000/api/stocks")
+    # append to stock_options to include current price that we get from get_stock_current_price() method
+    stock_options = stock_options.json()
+    for stock in stock_options:
+        stock["current_price"] = get_stock_current_price(stock["symbol"])
     return render_template("create.html", stock_options=stock_options)
 
 

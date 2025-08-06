@@ -2,18 +2,20 @@
 {% block title %}Add New Stock{% endblock %}
 
 {% block content %}
-<h2>Add New Stock</h2>
+<h2>Buy New Stock</h2>
 <form action="/stocks/create" method="post">
-  <label>Select Stock:</label>
-  <select name="symbol" required onchange="fillFields(this)">
+  <label>Select Stock:
+  <select name="stock_id" required onchange="fillFields(this)">
     <option value="" disabled selected>Select one</option>
     {% for stock in stock_options %}
-      <option value="{{ stock.symbol }}"
+      <option value="{{ stock.stock_id }}"
               data-name="{{ stock.company_name }}"
-              data-sector="{{ stock.sector }}">{{ stock.symbol }} - {{ stock.company_name }}</option>
+              data-sector="{{ stock.sector }}"
+              data-price="{{ stock.current_price }}">{{ stock.symbol }} - {{ stock.company_name }}</option>
     {% endfor %}
-  </select><br><br>
-
+  </select></label><br>
+  <label>Quantity: <input type="number" name="quantity" required></label><br>
+  <label>Current price: <input type="text" name="price" id="current_price" readonly/><label><br>
   <label>Company Name: <input type="text" name="company_name" id="company_name" required readonly></label><br>
   <label>Sector: <input type="text" name="sector" id="sector" readonly></label><br>
 
@@ -25,6 +27,7 @@
     const selected = select.options[select.selectedIndex];
     document.getElementById("company_name").value = selected.dataset.name;
     document.getElementById("sector").value = selected.dataset.sector;
+    document.getElementById("current_price").value = selected.dataset.price;
   }
 </script>
 
