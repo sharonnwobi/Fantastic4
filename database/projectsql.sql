@@ -19,7 +19,7 @@ CREATE TABLE transactions (
     -- IF NO, then a new row is entered: use SYMBOL from user input to find mathcung stock_id on stocks table, then insert into portolo with relevant quantities.
     -- Note: if adding new row, only two fields are needed in logic, call stored proceedure
     
-    stock_id INT PRIMARY KEY,
+    stock_id INT, -- cannot be primary key 
     price DOUBLE NOT NULL,
     quantity DECIMAL(12, 2) NOT NULL,
     transaction_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -34,7 +34,6 @@ avg_price DOUBLE,
 timestamp_hist DATETIME
 FOREIGN KEY (symbol) REFERENCES stocks(symbol) ON DELETE CASCADE
  -- Create trigger to auto remove history based on portfolio: link histtory to portfolio
-
 )
 
 
@@ -56,15 +55,15 @@ DELIMITER;
 
 
 -- STORED PROCEEDURE for transactions --
-USE transaction_sproc
+USE transactions_sproc
 DELIMITER //
-CREATE PROCEDURE transaction_sproc
+CREATE PROCEDURE transactions_sproc
 	(
 	stock_id INT,
     price DOUBLE,
 	quantity DECIMAL(12, 2))
 BEGIN
-	INSERT INTO portfolio
+	INSERT INTO transactions
     (stock_id, price, quantity)
     VALUES
     (stock_id, price, quantity);
@@ -106,8 +105,14 @@ CALL stocks_sproc('NVDA', 'NVIDIA Corporation', 'Technology');
 CALL stocks_sproc('PFE', 'Pfizer Inc.', 'Healthcare');
 CALL stocks_sproc('KO', 'The Coca-Cola Company', 'Consumer Staples');
 
+CALL transactions_sproc(1001, 14.00, 4 );
+CALL transactions_sproc(1001, -15.50, -2);
+CALL transactions_sproc(1003, 205.00, 3);
+CALL transactions_sproc(1005, 50.77, 1);
+CALL transactions_sproc(1003, 189.00, -1 );
 
-SELECT * FROM stocks;
+SELECT * FROM transactions;
+SELECT s.symbol, SUM(t.price) AS total_price, SUM(t.quantity) AS total_quantity FROM transactions t JOIN stocks s ON  s.stock_id = t.stock_id GROUP BY s.symbol;
 
 
 
