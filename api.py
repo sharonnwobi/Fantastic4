@@ -7,7 +7,7 @@ from database.connection import get_last_timestamp_for_stock
 from helpers.yfinance_lookup import get_stock_history
 from datetime import datetime
 from database.connection import process_history
-
+from database.connection import view_portfolio
 app = Flask("api")
 api = Api(app)
 class Stocks(Resource):
@@ -54,7 +54,7 @@ class Transactions(Resource):
         cursor = db.cursor(dictionary=True)
         cursor.execute("""
                        SELECT transactions.*, stocks.symbol, stocks.company_name
-                       FROM transactions JOIN stocks ON transactions.stock_id = stocks.stock_id; 
+                       FROM transactions JOIN stocks ON transactions.stock_id = stocks.stock_id;
                        """)
         portfolio = cursor.fetchall()
         cursor.close()
@@ -73,6 +73,27 @@ class Transactions(Resource):
         except Exception as e:
             print(f"Error: {e}")
 
+
+    # def get(self):
+    #     #data = request.get_json()
+    #     try:
+    #         db = connect_to_database()
+    #         cursor = db.cursor()
+    #         query = ("SELECT s.stock_id, s.symbol, SUM(t.price) AS total_price, SUM(t.quantity) AS total_quantity FROM transactions t JOIN stocks s ON  s.stock_id = t.stock_id GROUP BY s.symbol")
+    #         cursor.execute(query)
+    #         results = cursor.fetchall()
+    #         cursor.close()
+    #         #return results
+    #         return jsonify(results)
+    #     except Exception as e:
+    #         print(f"Error: {e}")
+
+
+        # finally:
+        #     db.rollback()
+
+
+
 class Companies(Resource):
     def get(self):
         db = connect_to_database()
@@ -83,6 +104,13 @@ class Companies(Resource):
         stocks = cursor.fetchall()
         cursor.close()
         return jsonify(stocks)
+
+
+
+
+class SideBar(Resource):
+    def get(self):
+        return jsonify(view_portfolio())
 
 api.add_resource(Stocks, '/api/stocks/<stock_id>', '/api/stocks')
 api.add_resource(Transactions, '/api/transactions')

@@ -1,8 +1,37 @@
-{% block sidebar %}
-<aside>
-    <ul>
-        <li><a href="/stocks/create">Buy Stock</a></li>
-        <li><a href="/stocks/sell">Sell Stock</a></li>
-    </ul>
-</aside>
-{% endblock %}
+{##}
+{#{% block content %}Stock List#}
+{##}
+{#  {% include 'sidebar.html' %}#}
+
+  <div class="main-content">
+    <table id="myPortfolio">
+        <tr>
+            <th>Stock_id</th>
+            <th>Symbol</th>
+            <th>total_price</th>
+            <th>total_quantity</th>
+        </tr>
+
+        <thead>
+        <tbody>
+            {% for entry in portfolio_data %}
+            <tr>
+               <td>{{ portfoio_data[1] }}</td>
+                <td>{{ portfolio_data[2] }}</td>
+                <td>{{ portfolio_data[3] }}</td>
+                <td>{{ portfolio_data[4] }}</td>
+                <td>{{ portfolio_data[5] }}</td>
+            </tr>
+        </tbody>
+        </thead>
+    </table>
+  <script>
+      const maxRows =5;
+      const table = document.getElementById("myPortfolio")
+      const rows = table.tBodies[0].rows
+      for (let i = maxRows; i<rows.length; i++){
+          rows[i].style.display = "none";
+      }
+  </script>
+  </div>
+{#{% endblock %}#}

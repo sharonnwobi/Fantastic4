@@ -3,6 +3,7 @@ import requests
 from database.connection import connect_to_database
 from datetime import datetime
 from helpers.yfinance_lookup import get_stock_current_price
+from api import Stocks, Transactions, Companies, SideBar
 
 app = Flask(__name__)
 
@@ -10,8 +11,10 @@ app = Flask(__name__)
 def show_stocks():
     response = requests.get("http://localhost:5000/api/dashboard")
     data = response.json()
-    portfolio_data = requests.get("http://localhost:5000/api/sidebar").json()
+    portfolio_data = requests.get("http://localhost:5000/api/sidebar")
+    portfolio_data = portfolio_data.json()
     return render_template("index.html", stocks=data["stocks"], history=data["history"], portfolio_data=portfolio_data)
+
 
 # FOR THE BUY STOCKS PAGE
 @app.route("/stocks/create", methods=["GET", "POST"])
@@ -99,6 +102,13 @@ def stock_overview(symbol):
     prices = data.get("prices", [])
 
     return render_template("overview.html", info=info, timestamps=timestamps, prices=prices)
+
+
+#
+# @app.route("/stocks", methods=["GET", "POST"])
+# def portfolio_summary():
+#     portfolio = requests.get("http://localhost:5000/api/transactions")
+#     portfolio = portfolio.json()
 
 
 
