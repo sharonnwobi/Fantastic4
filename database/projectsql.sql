@@ -34,7 +34,7 @@ avg_price DOUBLE,
 timestamp_hist DATETIME,
 FOREIGN KEY (stock_id) REFERENCES stocks(stock_id) ON DELETE CASCADE
  -- Create trigger to auto remove history based on portfolio: link histtory to portfolio
-)
+);
 
 
 

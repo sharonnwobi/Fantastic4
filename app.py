@@ -99,6 +99,55 @@ def stock_overview(symbol):
     prices = data.get("prices", [])
 
     return render_template("overview.html", info=info, timestamps=timestamps, prices=prices)
+@app.route("/overview")
+def overview():
+    db = connect_to_database()
+    cursor = db.cursor(dictionary=True)
+
+    # Lekérdezés az aktuális portfólió kiszámítására
+    cursor.execute("""
+        SELECT 
+            s.symbol AS stock_symbol,
+            s.company_name,
+            SUM(t.quantity) AS quantity
+        FROM 
+            transactions t
+        JOIN 
+            stocks s ON t.stock_id = s.stock_id
+        GROUP BY 
+            s.symbol, s.company_name
+        HAVING 
+            quantity > 0
+    """)
+    results = cursor.fetchall()
+
+    portfolio_data = []
+    total_value = 0
+    top_stock = None
+
+    for row in results:
+        price = get_stock_current_price(row["stock_symbol"])  # Pl. yfinance vagy más API
+        total = float(row["quantity"]) * price
+        total_value += total
+
+        stock_data = {
+            "symbol": row["stock_symbol"],
+            "company_name": row["company_name"],
+            "quantity": row["quantity"],
+            "current_price": round(price, 2),
+            "total_value": round(total, 2)
+        }
+
+        if not top_stock or total > top_stock["total_value"]:
+            top_stock = stock_data
+
+        portfolio_data.append(stock_data)
+
+    return render_template("overview.html",
+                           portfolio=portfolio_data,
+                           total_value=round(total_value, 2),
+                           top_stock=top_stock)
+
 
 
 
