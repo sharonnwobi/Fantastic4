@@ -11,9 +11,10 @@ app = Flask(__name__)
 def show_stocks():
     response = requests.get("http://localhost:5000/api/dashboard")
     data = response.json()
+    print(data["portfolioHistory"])
     portfolio_data = requests.get("http://localhost:5000/api/sidebar")
     portfolio_data = portfolio_data.json()
-    return render_template("index.html", stocks=data["stocks"], history=data["history"], portfolio_data=portfolio_data)
+    return render_template("index.html", stocks=data["stocks"], history=data["history"], portfolioHistory=data["portfolioHistory"], portfolio_data=portfolio_data)
 
 
 # FOR THE BUY STOCKS PAGE
@@ -145,11 +146,14 @@ def overview():
             top_stock = stock_data
 
         portfolio_data.append(stock_data)
+    pf_data = requests.get("http://localhost:5000/api/sidebar")
+    pf_data = pf_data.json()
 
     return render_template("overview.html",
                            portfolio=portfolio_data,
                            total_value=round(total_value, 2),
-                           top_stock=top_stock)
+                           top_stock=top_stock,
+                           portfolio_data=pf_data)
 
 
 

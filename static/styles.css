@@ -155,3 +155,16 @@ a:hover {
 .actions a:last-child {
   color: var(--danger);
 }
+
+canvas {
+  max-width: 750px;
+  max-height: 400px;
+  height: auto;
+}
+
+.charts {
+  display: flex;
+  justify-content: right;
+  align-items: right;
+  margin-top: 20px;
+}

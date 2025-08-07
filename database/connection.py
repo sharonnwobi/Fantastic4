@@ -1,5 +1,6 @@
 import mysql.connector
 from config import HOST, USER, PASSWORD
+from datetime import datetime
 
 
 def connect_to_database():
@@ -100,3 +101,62 @@ def process_history(stock_id, history):
         "timestamps": timestamps,
         "prices": prices
     }
+    
+def get_all_transactions():
+    try:
+        db_connection = connect_to_database()
+        cursor = db_connection.cursor(dictionary=True)
+        print("Connected to database")
+        cursor.execute("SELECT stock_id, price, quantity, transaction_date FROM transactions")
+
+        result = []
+        for row in cursor.fetchall():
+            stock_id = row['stock_id']
+            price = float(row['price'])
+            quantity = float(row['quantity'])
+            timestamp = row['transaction_date']
+
+            result.append({
+                "stock_id": stock_id,
+                "price": price,
+                "quantity": quantity,
+                "timestamp": timestamp
+            })
+        cursor.close()
+        return result
+    except Exception as e:
+        print(e)
+
+def calculate_portfolio_value_over_time(filtered_history, transactions):
+    if not filtered_history:
+        return []
+
+    timestamps = filtered_history[0]['history']['timestamps']
+    portfolio_value = [0.0] * len(timestamps)
+
+    for stock in filtered_history:
+        stock_id = stock['stock_id']
+        prices = stock['history']['prices']
+        stock_timestamps = [datetime.strptime(ts, '%Y-%m-%d %H:%M') for ts in stock['history']['timestamps']]
+
+        print(stock_timestamps, prices)
+        stock_transactions = sorted(
+            [t for t in transactions if t['stock_id'] == stock_id],
+            key=lambda t: t['timestamp']
+        )
+
+        quantity_over_time = []
+        current_quantity = 0
+        tx_index = 0
+
+        for ts in stock_timestamps:
+            while tx_index < len(stock_transactions) and stock_transactions[tx_index]['timestamp'] <= ts:
+                current_quantity += stock_transactions[tx_index]['quantity']
+                tx_index += 1
+
+            quantity_over_time.append(current_quantity)
+
+        for i in range(len(portfolio_value)):
+            portfolio_value[i] += prices[i] * quantity_over_time[i]
+
+    return [round(v, 2) for v in portfolio_value]

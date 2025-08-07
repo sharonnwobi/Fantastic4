@@ -2,56 +2,62 @@
 
 {% block content %}
 <h2>Stock Portfolio</h2>
-<table>
-  <tr>
-    <th>Symbol</th>
-    <th>total_price</th>
-    <th>total_quantity</th>
-  </tr>
-  <tr>
-    {% for stock in stocks %}
-      <td>{{ stock[1] }}</td>
-      <td>{{ stock[2] }}</td>
-      <td>{{ stock[3] }}</td>
-    </tr>
-    {% endfor %}
-  </tr>
-</table>
+
 <span id="stocks-data" style="display: none;">{{ stocks | tojson }}</span>
 <span id="history-data" style="display: none;">{{ history | tojson }}</span>
 
-<canvas id="portfolioChart" width="800" height="400"></canvas>
-
+<div class="charts">
+  <canvas id="pieChart" width="800" height="400"></canvas>
+  <div>
+    
+    <canvas id="portfolioChart" width="800" height="400"></canvas>
+  </div>
+</div>
+<table>
+      <tr>
+        <th>Symbol</th>
+        <th>total_price</th>
+        <th>total_quantity</th>
+      </tr>
+      <tr>
+        {% for stock in stocks %}
+        <td>{{ stock[1] }}</td>
+        <td>{{ stock[2] }}</td>
+        <td>{{ stock[3] }}</td>
+      </tr>
+      {% endfor %}
+      </tr>
+    </table>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-  const stocks = JSON.parse(document.getElementById("stocks-data").textContent);
-  const history = JSON.parse(document.getElementById("history-data").textContent);
+  document.addEventListener("DOMContentLoaded", function () {
+    const stocks = JSON.parse(document.getElementById("stocks-data").textContent);
+    const history = JSON.parse(document.getElementById("history-data").textContent);
 
-  const portfolioHistory = [];
-  const labels = history[0].history.timestamps;
-  
-  for (let i = 0; i < labels.length; i++) {
-    let total = 0;
-    
-    for (let h = 0; h < history.length; h++) {
-      const symbol = history[h].symbol;
-      const price = history[h].history.prices[i];
-      
-      const matchingStock = stocks.find(s => s[1] === symbol);
-      if (!matchingStock) continue;
+    const portfolioHistory = [];
+    const labels = history[0].history.timestamps;
 
-      const quantity = parseFloat(matchingStock[3]);
-      total += price * quantity;
+    for (let i = 0; i < labels.length; i++) {
+      let total = 0;
+
+      for (let h = 0; h < history.length; h++) {
+        const symbol = history[h].symbol;
+        const price = history[h].history.prices[i];
+
+        const matchingStock = stocks.find(s => s[1] === symbol);
+        if (!matchingStock) continue;
+
+        const quantity = parseFloat(matchingStock[3]);
+        total += price * quantity;
+      }
+
+      portfolioHistory.push(total.toFixed(2));
     }
 
-    portfolioHistory.push(total.toFixed(2));
-  }
-
-  const ctx = document.getElementById('portfolioChart').getContext('2d');
-  new Chart(ctx, {
-    type: 'line',
-    data: {
+    const ctx = document.getElementById('portfolioChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
       labels: labels,
       datasets: [{
         label: 'Portfolio Value Over Time',
@@ -60,31 +66,74 @@ document.addEventListener("DOMContentLoaded", function () {
         borderColor: 'rgb(75, 192, 192)',
         tension: 0.1
       }]
-    },
-    options: {
+      },
+      options: {
       responsive: true,
       scales: {
         x: {
-          ticks: {
-            autoSkip: true,
-            maxTicksLimit: 15
-          }
+        ticks: {
+          display: false
+        },
+        grid: {
+          display: false
+        }
         },
         y: {
-          beginAtZero: false,
+        beginAtZero: false,
+        title: {
+          display: true,
+          text: 'USD ($)'
+        }
+        }
+      }
+      }
+    });
+
+    const pieData = {
+      labels: stocks.map(stock => stock[1]),
+      datasets: [{
+        label: 'Portfolio Distribution',
+        data: stocks.map(stock => parseFloat(stock[2])),
+        backgroundColor: [
+          'rgba(255, 99, 132, 0.8)',
+          'rgba(54, 162, 235, 0.8)',
+          'rgba(255, 206, 86, 0.8)',
+          'rgba(75, 192, 192, 0.8)',
+          'rgba(153, 102, 255, 0.8)',
+          'rgba(255, 159, 64, 0.8)',
+          'rgba(201, 203, 207, 0.8)',
+          'rgba(255, 99, 132, 0.8)',
+          'rgba(54, 162, 235, 0.8)',
+          'rgba(255, 206, 86, 0.8)'
+        ],
+        borderColor: [
+          'rgba(255, 99, 132, 1)',
+          'rgba(54, 162, 235, 1)',
+          'rgba(255, 206, 86, 1)',
+          'rgba(75, 192, 192, 1)',
+          'rgba(153, 102, 255, 1)'
+        ],
+        borderWidth: 1
+      }]
+    };
+    const pieCtx = document.getElementById('pieChart').getContext('2d');
+    new Chart(pieCtx, {
+      type: 'pie',
+      data: pieData,
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'top',
+          },
           title: {
             display: true,
-            text: 'USD ($)'
+            text: 'Portfolio Distribution by Stock'
           }
         }
       }
-    }
+    });
   });
-});
 </script>
 
-{% endblock %}
-
-{% block sidebar %}
-    {% include "sidebar.html" %}
 {% endblock %}

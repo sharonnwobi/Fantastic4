@@ -8,6 +8,9 @@ from helpers.yfinance_lookup import get_stock_history
 from datetime import datetime
 from database.connection import process_history
 from database.connection import view_portfolio
+from database.connection import get_all_transactions
+from database.connection import calculate_portfolio_value_over_time
+
 app = Flask("api")
 api = Api(app)
 class Stocks(Resource):
@@ -26,24 +29,33 @@ class Stocks(Resource):
 class Dashboard(Resource):
     def get(self):
         data = view_portfolio()
+        transactions = get_all_transactions()
+
         filtered_history = []
         for stock in data:
-            last_timestamp = get_last_timestamp_for_stock(stock[1])
-            if last_timestamp:
-                datetime_now = datetime.now()
-                period = "1d" if (datetime_now - last_timestamp).days < 1 else "5d"
-            else:
-                period = "1d"
-            history = get_stock_history(stock[1], period)
+            stock_id = stock[0]
+            symbol = stock[1]
+
+            last_timestamp = get_last_timestamp_for_stock(symbol)
+            datetime_now = datetime.now()
+            period = "1d" if last_timestamp and (datetime_now - last_timestamp).days < 1 else "5d"
+
+            history = get_stock_history(symbol, period)
+            processed = process_history(stock_id, history)
+
             filtered_history.append({
-                "symbol": stock[1],
-                "history": process_history(stock[0], history)
+                "symbol": symbol,
+                "stock_id": stock_id,
+                "history": processed
             })
+
+        portfolio_over_time = calculate_portfolio_value_over_time(filtered_history, transactions)
+
         return jsonify({
             "stocks": data,
-            "history": filtered_history
+            "history": filtered_history,
+            "portfolioHistory": portfolio_over_time  # új!
         })
-        
 class Sidebar(Resource):
     def get(self):
         return jsonify(view_portfolio())
