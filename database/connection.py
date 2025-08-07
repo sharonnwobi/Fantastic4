@@ -80,13 +80,19 @@ def process_history(stock_id, history):
     prices = history['prices']
     db_connection = connect_to_database()
     cursor = db_connection.cursor()
-    print("Connected to database")
     query = "INSERT INTO portfolio_history (stock_id, timestamp_hist, avg_price) VALUES (%s, %s, %s)"
     for timestamp, price in zip(timestamps, prices):
         cursor.execute("SELECT COUNT(*) FROM portfolio_history WHERE stock_id = %s AND timestamp_hist = %s", (stock_id, timestamp))
         if cursor.fetchone()[0] == 0:
             cursor.execute(query, (stock_id, timestamp, price))
     db_connection.commit()
+    cursor.close()
+    
+    cursor = db_connection.cursor(dictionary=True)
+    cursor.execute("SELECT timestamp_hist, avg_price FROM portfolio_history WHERE stock_id = %s ORDER BY timestamp_hist", (stock_id,))
+    history_data = cursor.fetchall()
+    timestamps = [row['timestamp_hist'].strftime('%Y-%m-%d %H:%M') for row in history_data]
+    prices = [row['avg_price'] for row in history_data]
     cursor.close()
     db_connection.close()
     
