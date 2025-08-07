@@ -19,8 +19,6 @@
       <td>{{ stock.company_name }}</td>
       <td>{{ stock.sector }}</td>
       <td class="actions">
-        <a href="/stocks/edit/{{ stock.stock_id }}">Edit</a>
-        <a href="/stocks/delete/{{ stock.stock_id }}" onclick="return confirm('Are you sure?')">Delete</a>
       </td>
     </tr>
     {% endfor %}

@@ -12,6 +12,7 @@ def show_stocks():
     stocks = response.json()
     return render_template("index.html", stocks=stocks)
 
+# FOR THE BUY STOCKS PAGE
 @app.route("/stocks/create", methods=["GET", "POST"])
 def create_stock():
     if request.method == "POST":
@@ -33,37 +34,8 @@ def create_stock():
     return render_template("create.html", stock_options=stock_options)
 
 
-@app.route("/stocks/edit/<int:stock_id>", methods=["GET", "POST"])
-def edit_stock(stock_id):
-    db = connect_to_database()
-    cursor = db.cursor(dictionary=True)
-    if request.method == "POST":
-        symbol = request.form["symbol"]
-        name = request.form["company_name"]
-        sector = request.form["sector"]
-        cursor.execute(
-            "UPDATE stocks SET symbol=%s, company_name=%s, sector=%s WHERE stock_id=%s",
-            (symbol, name, sector, stock_id)
-        )
-        db.commit()
-        cursor.close()
-        return redirect("/stocks")
-    else:
-        cursor.execute("SELECT * FROM stocks WHERE stock_id = %s", (stock_id,))
-        stock = cursor.fetchone()
-        cursor.close()
-        return render_template("edit.html", stock=stock)
-# @app.route("/stocks/delete/<int:stock_id>")
-# def delete_stock(stock_id):
-#     db = connect_to_database()
-#     cursor = db.cursor()
-#     #Dont have to do it after the new db /cascade on portfolio/
-#     cursor.execute("DELETE FROM portfolio WHERE stock_id = %s", (stock_id,))
-#     cursor.execute("DELETE FROM stocks WHERE stock_id = %s", (stock_id,))
-#     db.commit()
-#     cursor.close()
-#     return redirect("/stocks")
 
+#TO SEE PARTICULAR STOCKS ON OVERVIEW PAGE FOR STATED STOCK
 @app.route("/stocks/<symbol>")
 def stock_overview(symbol):
     response = requests.get("http://localhost:5000/api/stocks/" + symbol)
@@ -76,6 +48,12 @@ def stock_overview(symbol):
     prices = data.get("prices", [])
 
     return render_template("overview.html", info=info, timestamps=timestamps, prices=prices)
+
+
+
+
+
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=5001)

@@ -40,7 +40,7 @@ def view_porfolio():
         db_connection = connect_to_database()
         cursor = db_connection.cursor()
         print("Connected to database")
-        query = ("SELECT s.symbol, SUM(t.price) AS total_price, SUM(t.quantity) AS total_quantity FROM transactions t JOIN stocks s ON  s.stock_id = t.stock_id GROUP BY s.symbol")
+        query = ("SELECT s.stock_id, s.symbol, SUM(t.price) AS total_price, SUM(t.quantity) AS total_quantity FROM transactions t JOIN stocks s ON  s.stock_id = t.stock_id GROUP BY s.symbol")
         cursor.execute(query)
         result = cursor.fetchall()
         cursor.close()
