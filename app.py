@@ -8,10 +8,10 @@ app = Flask(__name__)
 
 @app.route("/stocks")
 def show_stocks():
-    response = requests.get("http://localhost:5000/api/stocks")
+    response = requests.get("http://localhost:5000/api/dashboard")
     data = response.json()
-    print(data)
-    return render_template("index.html", stocks=data["stocks"], history=data["history"])
+    portfolio_data = requests.get("http://localhost:5000/api/sidebar").json()
+    return render_template("index.html", stocks=data["stocks"], history=data["history"], portfolio_data=portfolio_data)
 
 # FOR THE BUY STOCKS PAGE
 @app.route("/stocks/create", methods=["GET", "POST"])
@@ -19,8 +19,8 @@ def create_stock():
     if request.method == "POST":
 
         stock_id = request.form.get("stock_id")
-        price = request.form.get("price")
-        quantity = request.form["quantity"]
+        quantity = float(request.form["quantity"])
+        price = float(request.form.get("price")) * quantity
 
         payload = {"stock_id": stock_id, "price": price, "quantity": quantity}
 
@@ -29,10 +29,11 @@ def create_stock():
 
     stock_options = requests.get("http://localhost:5000/api/stocks")
 
+    portfolio_data = requests.get("http://localhost:5000/api/sidebar").json()
     stock_options = stock_options.json()
     for stock in stock_options:
         stock["current_price"] = get_stock_current_price(stock["symbol"])
-    return render_template("create.html", stock_options=stock_options)
+    return render_template("create.html", stock_options=stock_options, portfolio_data=portfolio_data)
 
 
 @app.route("/stocks/sell", methods=["GET", "POST"])
@@ -40,9 +41,8 @@ def sell_stock():
     if request.method == "POST":
 
         stock_id = request.form.get("stock_id")
-        price = float(request.form.get("price")) * -1
         quantity = float(request.form.get("quantity")) * -1
-        print(request.form)
+        price = float(request.form.get("price")) * quantity
 
         payload = {"stock_id": stock_id, "price": price, "quantity": quantity}
 

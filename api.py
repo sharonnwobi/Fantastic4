@@ -16,25 +16,38 @@ class Stocks(Resource):
             data = get_stock_info(stock_id)
             return jsonify(data)
         else:
-            data = view_portfolio()
-            filtered_history = []
-            for stock in data:
-                last_timestamp = get_last_timestamp_for_stock(stock[1])
-                if last_timestamp:
-                    datetime_now = datetime.now()
-                    period = "1d" if (datetime_now - last_timestamp).days < 1 else "5d"
-                else:
-                    period = "1d"
-                history = get_stock_history(stock[1], period)
-                filtered_history.append({
-                    "symbol": stock[1],
-                    "history": process_history(stock[0], history)
-                })
-            return jsonify({
-                "stocks": data,
-                "history": filtered_history
+            db = connect_to_database()
+            cursor = db.cursor(dictionary=True) #using dictonary
+            cursor.execute("SELECT * FROM stocks")
+            stocks = cursor.fetchall()
+            cursor.close()
+            return jsonify(stocks)
+
+class Dashboard(Resource):
+    def get(self):
+        data = view_portfolio()
+        filtered_history = []
+        for stock in data:
+            last_timestamp = get_last_timestamp_for_stock(stock[1])
+            if last_timestamp:
+                datetime_now = datetime.now()
+                period = "1d" if (datetime_now - last_timestamp).days < 1 else "5d"
+            else:
+                period = "1d"
+            history = get_stock_history(stock[1], period)
+            filtered_history.append({
+                "symbol": stock[1],
+                "history": process_history(stock[0], history)
             })
+        return jsonify({
+            "stocks": data,
+            "history": filtered_history
+        })
         
+class Sidebar(Resource):
+    def get(self):
+        return jsonify(view_portfolio())
+    
 class Transactions(Resource):
     def get(self):
         db = connect_to_database()
@@ -50,6 +63,7 @@ class Transactions(Resource):
 
     def post(self):
         data = request.get_json()
+        print(data["price"], )
         try:
             db = connect_to_database()
             cursor = db.cursor()
@@ -73,6 +87,8 @@ class Companies(Resource):
 api.add_resource(Stocks, '/api/stocks/<stock_id>', '/api/stocks')
 api.add_resource(Transactions, '/api/transactions')
 api.add_resource(Companies, '/api/companies')
+api.add_resource(Dashboard, '/api/dashboard')
+api.add_resource(Sidebar, '/api/sidebar')
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
