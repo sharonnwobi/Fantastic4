@@ -1,27 +1,26 @@
-{##}
-{#{% block content %}Stock List#}
-{##}
-{#  {% include 'sidebar.html' %}#}
+{% block content %}
 
   <div class="main-content">
+    <ul>
+        <li><a href="/stocks/create">Buy Stock</a></li>
+        <li><a href="/stocks/sell">Sell Stock</a></li>
+    </ul>
     <table id="myPortfolio">
         <tr>
-            <th>Stock_id</th>
             <th>Symbol</th>
-            <th>total_price</th>
-            <th>total_quantity</th>
+            <th>Price</th>
+            <th>Quantity</th>
         </tr>
 
         <thead>
         <tbody>
             {% for entry in portfolio_data %}
             <tr>
-               <td>{{ portfoio_data[1] }}</td>
-                <td>{{ portfolio_data[2] }}</td>
-                <td>{{ portfolio_data[3] }}</td>
-                <td>{{ portfolio_data[4] }}</td>
-                <td>{{ portfolio_data[5] }}</td>
+                <td>{{ entry[1] }}</td>
+                <td>{{ '%0.2f'| format(entry[2]|float) }}</td>
+                <td>{{ entry[3] }}</td>
             </tr>
+            {% endfor %}
         </tbody>
         </thead>
     </table>
@@ -34,4 +33,17 @@
       }
   </script>
   </div>
-{#{% endblock %}#}
+
+  <style>
+    #myPortfolio {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid #ddd;
+      margin-top: 30px;
+    }
+
+    #myPortfolio tr:hover {
+        background-color: #89b5bd;
+    }
+  </style>
+{% endblock %}
