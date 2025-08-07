@@ -105,12 +105,6 @@ CALL stocks_sproc('NVDA', 'NVIDIA Corporation', 'Technology');
 CALL stocks_sproc('PFE', 'Pfizer Inc.', 'Healthcare');
 CALL stocks_sproc('KO', 'The Coca-Cola Company', 'Consumer Staples');
 
-CALL transactions_sproc(1001, 14.00, 4 );
-CALL transactions_sproc(1001, -15.50, -2);
-CALL transactions_sproc(1003, 205.00, 3);
-CALL transactions_sproc(1005, 50.77, 1);
-CALL transactions_sproc(1003, 189.00, -1 );
-
 SELECT * FROM transactions;
 SELECT s.symbol, SUM(t.price) AS total_price, SUM(t.quantity) AS total_quantity FROM transactions t JOIN stocks s ON  s.stock_id = t.stock_id GROUP BY s.symbol;
 

@@ -7,7 +7,7 @@ from database.connection import get_last_timestamp_for_stock
 from helpers.yfinance_lookup import get_stock_history
 from datetime import datetime
 from database.connection import process_history
-
+from database.connection import view_portfolio
 app = Flask("api")
 api = Api(app)
 class Stocks(Resource):
@@ -16,32 +16,45 @@ class Stocks(Resource):
             data = get_stock_info(stock_id)
             return jsonify(data)
         else:
-            data = view_portfolio()
-            filtered_history = []
-            for stock in data:
-                last_timestamp = get_last_timestamp_for_stock(stock[1])
-                if last_timestamp:
-                    datetime_now = datetime.now()
-                    period = "1d" if (datetime_now - last_timestamp).days < 1 else "5d"
-                else:
-                    period = "1d"
-                history = get_stock_history(stock[1], period)
-                filtered_history.append({
-                    "symbol": stock[1],
-                    "history": process_history(stock[0], history)
-                })
-            return jsonify({
-                "stocks": data,
-                "history": filtered_history
+            db = connect_to_database()
+            cursor = db.cursor(dictionary=True) #using dictonary
+            cursor.execute("SELECT * FROM stocks")
+            stocks = cursor.fetchall()
+            cursor.close()
+            return jsonify(stocks)
+
+class Dashboard(Resource):
+    def get(self):
+        data = view_portfolio()
+        filtered_history = []
+        for stock in data:
+            last_timestamp = get_last_timestamp_for_stock(stock[1])
+            if last_timestamp:
+                datetime_now = datetime.now()
+                period = "1d" if (datetime_now - last_timestamp).days < 1 else "5d"
+            else:
+                period = "1d"
+            history = get_stock_history(stock[1], period)
+            filtered_history.append({
+                "symbol": stock[1],
+                "history": process_history(stock[0], history)
             })
+        return jsonify({
+            "stocks": data,
+            "history": filtered_history
+        })
         
+class Sidebar(Resource):
+    def get(self):
+        return jsonify(view_portfolio())
+    
 class Transactions(Resource):
     def get(self):
         db = connect_to_database()
         cursor = db.cursor(dictionary=True)
         cursor.execute("""
                        SELECT transactions.*, stocks.symbol, stocks.company_name
-                       FROM transactions JOIN stocks ON transactions.stock_id = stocks.stock_id; 
+                       FROM transactions JOIN stocks ON transactions.stock_id = stocks.stock_id;
                        """)
         portfolio = cursor.fetchall()
         cursor.close()
@@ -50,6 +63,7 @@ class Transactions(Resource):
 
     def post(self):
         data = request.get_json()
+        print(data["price"], )
         try:
             db = connect_to_database()
             cursor = db.cursor()
@@ -58,6 +72,27 @@ class Transactions(Resource):
             cursor.close()
         except Exception as e:
             print(f"Error: {e}")
+
+
+    # def get(self):
+    #     #data = request.get_json()
+    #     try:
+    #         db = connect_to_database()
+    #         cursor = db.cursor()
+    #         query = ("SELECT s.stock_id, s.symbol, SUM(t.price) AS total_price, SUM(t.quantity) AS total_quantity FROM transactions t JOIN stocks s ON  s.stock_id = t.stock_id GROUP BY s.symbol")
+    #         cursor.execute(query)
+    #         results = cursor.fetchall()
+    #         cursor.close()
+    #         #return results
+    #         return jsonify(results)
+    #     except Exception as e:
+    #         print(f"Error: {e}")
+
+
+        # finally:
+        #     db.rollback()
+
+
 
 class Companies(Resource):
     def get(self):
@@ -70,9 +105,18 @@ class Companies(Resource):
         cursor.close()
         return jsonify(stocks)
 
+
+
+
+class SideBar(Resource):
+    def get(self):
+        return jsonify(view_portfolio())
+
 api.add_resource(Stocks, '/api/stocks/<stock_id>', '/api/stocks')
 api.add_resource(Transactions, '/api/transactions')
 api.add_resource(Companies, '/api/companies')
+api.add_resource(Dashboard, '/api/dashboard')
+api.add_resource(Sidebar, '/api/sidebar')
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

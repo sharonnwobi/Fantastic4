@@ -44,7 +44,7 @@ header h1 a {
 }
 
 .sidebar {
-  width: 220px;
+  width: 350px;
   background-color: var(--primary);
   color: white;
   padding: 2rem 1rem;
