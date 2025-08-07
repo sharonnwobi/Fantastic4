@@ -2,28 +2,88 @@
 {% block title %}Stock List{% endblock %}
 
 {% block content %}
-<h2>Available Stocks</h2>
-<table class="stock-table">
-  <thead>
-    <tr>
-      <th>Symbol</th>
-      <th>Name</th>
-      <th>Sector</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
+<h2>Stock Portfolio</h2>
+<p>My stocks</p>
+{{ stocks }}
+<table>
+  <tr>
+    <th>Symbol</th>
+    <th>Price</th>
+    <th>Quantity</th>
+  </tr>
+  <tr>
     {% for stock in stocks %}
-    <tr>
-      <td><a href="/stocks/{{stock.symbol}}">{{ stock.symbol }}</a></td>
-      <td>{{ stock.company_name }}</td>
-      <td>{{ stock.sector }}</td>
-      <td class="actions">
-        <a href="/stocks/edit/{{ stock.stock_id }}">Edit</a>
-        <a href="/stocks/delete/{{ stock.stock_id }}" onclick="return confirm('Are you sure?')">Delete</a>
-      </td>
+      <td>{{ stock[1] }}</td>
+      <td>{{ stock[2] }}</td>
+      <td>{{ stock[3] }}</td>
     </tr>
     {% endfor %}
-  </tbody>
+  </tr>
 </table>
+<span id="stocks-data" style="display: none;">{{ stocks | tojson }}</span>
+<span id="history-data" style="display: none;">{{ history | tojson }}</span>
+
+<canvas id="portfolioChart" width="800" height="400"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const stocks = JSON.parse(document.getElementById("stocks-data").textContent);
+  const history = JSON.parse(document.getElementById("history-data").textContent);
+
+  const portfolioHistory = [];
+  const labels = history[0].history.timestamps;
+  
+  for (let i = 0; i < labels.length; i++) {
+    let total = 0;
+    
+    for (let h = 0; h < history.length; h++) {
+      const symbol = history[h].symbol;
+      const price = history[h].history.prices[i];
+      
+      const matchingStock = stocks.find(s => s[1] === symbol);
+      if (!matchingStock) continue;
+
+      const quantity = parseFloat(matchingStock[3]);
+      total += price * quantity;
+    }
+
+    portfolioHistory.push(total.toFixed(2));
+  }
+
+  const ctx = document.getElementById('portfolioChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Portfolio Value Over Time',
+        data: portfolioHistory,
+        fill: false,
+        borderColor: 'rgb(75, 192, 192)',
+        tension: 0.1
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        x: {
+          ticks: {
+            autoSkip: true,
+            maxTicksLimit: 15
+          }
+        },
+        y: {
+          beginAtZero: false,
+          title: {
+            display: true,
+            text: 'USD ($)'
+          }
+        }
+      }
+    }
+  });
+});
+</script>
+
 {% endblock %}

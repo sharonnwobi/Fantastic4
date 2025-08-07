@@ -9,8 +9,9 @@ app = Flask(__name__)
 @app.route("/stocks")
 def show_stocks():
     response = requests.get("http://localhost:5000/api/stocks")
-    stocks = response.json()
-    return render_template("index.html", stocks=stocks)
+    data = response.json()
+    print(data)
+    return render_template("index.html", stocks=data["stocks"], history=data["history"])
 
 @app.route("/stocks/create", methods=["GET", "POST"])
 def create_stock():

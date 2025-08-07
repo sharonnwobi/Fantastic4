@@ -31,7 +31,7 @@ CREATE TABLE portfolio_history(
 -- history_id INT PRIMARY KEY AUTO_INCREMENT,
 symbol VARCHAR(50),
 avg_price DOUBLE,
-timestamp_hist DATETIME
+timestamp_hist DATETIME,
 FOREIGN KEY (symbol) REFERENCES stocks(symbol) ON DELETE CASCADE
  -- Create trigger to auto remove history based on portfolio: link histtory to portfolio
 )

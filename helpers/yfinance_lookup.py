@@ -26,3 +26,18 @@ def get_stock_current_price(symbol):
     except Exception as e:
         return f"Error fetching current price: {e}", 500
     return current_price
+
+def get_stock_history(symbol, period="1d", interval="5m"):
+    stock = yf.Ticker(symbol)
+    try:
+        history = stock.history(period=period, interval=interval)
+    except Exception as e:
+        return f"Error fetching stock history: {e}", 500
+
+    timestamps = history.index.strftime('%Y-%m-%d %H:%M').tolist()
+    prices = history["Close"].fillna(method="ffill").tolist()
+    
+    return {
+        "timestamps": timestamps,
+        "prices": prices
+    }
