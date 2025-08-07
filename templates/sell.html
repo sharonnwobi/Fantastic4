@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Add New Stock{% endblock %}
+
+{% block content %}
+<h2>Sell New Stock</h2>
+<form action="/stocks/sell" method="post">
+  <label>Select Stock:
+  <select name="stock_id" required onchange="fillFields(this)">
+    <option value="" disabled selected>Select one</option>
+    {% for stock in stock_options %}
+      <option value="{{ stock.stock_id }}"
+              data-name="{{ stock.company_name }}"
+              data-sector="{{ stock.sector }}"
+              data-price="{{ stock.current_price }}"
+              data-quantity="{{ stock.total }}">{{ stock.symbol }} - {{ stock.company_name }}</option>
+
+    {% endfor %}
+  </select></label><br>
+  <span>Holdings: <b><span id="holdings"></span></b></span><br><br/>
+  <label>Quantity: <input type="number" name="quantity" id = "quantity"></label><br>
+  <label>Current price: <input type="text" name="price" id="current_price" readonly/><label><br>
+
+  <button type="submit">Sell Stock</button>
+</form>
+
+<script>
+  function fillFields(select) {
+    const selected = select.options[select.selectedIndex];
+    document.getElementById("current_price").value = selected.dataset.price;
+    document.getElementById("holdings").innerText = selected.dataset.quantity || 0;
+    document.getElementById("quantity").max = selected.dataset.quantity || 1000;
+  }
+</script>
+
+{% endblock %}

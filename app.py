@@ -34,8 +34,58 @@ def create_stock():
     return render_template("create.html", stock_options=stock_options)
 
 
+@app.route("/stocks/sell", methods=["GET", "POST"])
+def sell_stock():
+    if request.method == "POST":
 
-#TO SEE PARTICULAR STOCKS ON OVERVIEW PAGE FOR STATED STOCK
+        stock_id = request.form.get("stock_id")
+        price = float(request.form.get("price")) * -1
+        quantity = float(request.form.get("quantity")) * -1
+        print(request.form)
+
+        payload = {"stock_id": stock_id, "price": price, "quantity": quantity}
+
+        requests.post("http://localhost:5000/api/transactions", json=payload)
+        return redirect("/stocks")
+
+    stock_options = requests.get("http://localhost:5000/api/companies")
+
+    stock_options = stock_options.json()
+    for stock in stock_options:
+        stock["current_price"] = get_stock_current_price(stock["symbol"])
+    return render_template("sell.html", stock_options=stock_options)
+
+@app.route("/stocks/edit/<int:stock_id>", methods=["GET", "POST"])
+def edit_stock(stock_id):
+    db = connect_to_database()
+    cursor = db.cursor(dictionary=True)
+    if request.method == "POST":
+        symbol = request.form["symbol"]
+        name = request.form["company_name"]
+        sector = request.form["sector"]
+        cursor.execute(
+            "UPDATE stocks SET symbol=%s, company_name=%s, sector=%s WHERE stock_id=%s",
+            (symbol, name, sector, stock_id)
+        )
+        db.commit()
+        cursor.close()
+        return redirect("/stocks")
+    else:
+        cursor.execute("SELECT * FROM stocks WHERE stock_id = %s", (stock_id,))
+        stock = cursor.fetchone()
+        cursor.close()
+        return render_template("edit.html", stock=stock)
+# @app.route("/stocks/delete/<int:stock_id>")
+# def delete_stock(stock_id):
+#     db = connect_to_database()
+#     cursor = db.cursor()
+#     #Dont have to do it after the new db /cascade on portfolio/
+#     cursor.execute("DELETE FROM portfolio WHERE stock_id = %s", (stock_id,))
+#     cursor.execute("DELETE FROM stocks WHERE stock_id = %s", (stock_id,))
+#     db.commit()
+#     cursor.close()
+#     return redirect("/stocks")
+
 @app.route("/stocks/<symbol>")
 def stock_overview(symbol):
     response = requests.get("http://localhost:5000/api/stocks/" + symbol)
