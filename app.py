@@ -13,6 +13,7 @@ def show_stocks():
     print(data)
     return render_template("index.html", stocks=data["stocks"], history=data["history"])
 
+# FOR THE BUY STOCKS PAGE
 @app.route("/stocks/create", methods=["GET", "POST"])
 def create_stock():
     if request.method == "POST":
@@ -33,6 +34,27 @@ def create_stock():
         stock["current_price"] = get_stock_current_price(stock["symbol"])
     return render_template("create.html", stock_options=stock_options)
 
+
+@app.route("/stocks/sell", methods=["GET", "POST"])
+def sell_stock():
+    if request.method == "POST":
+
+        stock_id = request.form.get("stock_id")
+        price = float(request.form.get("price")) * -1
+        quantity = float(request.form.get("quantity")) * -1
+        print(request.form)
+
+        payload = {"stock_id": stock_id, "price": price, "quantity": quantity}
+
+        requests.post("http://localhost:5000/api/transactions", json=payload)
+        return redirect("/stocks")
+
+    stock_options = requests.get("http://localhost:5000/api/companies")
+
+    stock_options = stock_options.json()
+    for stock in stock_options:
+        stock["current_price"] = get_stock_current_price(stock["symbol"])
+    return render_template("sell.html", stock_options=stock_options)
 
 @app.route("/stocks/edit/<int:stock_id>", methods=["GET", "POST"])
 def edit_stock(stock_id):
@@ -77,6 +99,12 @@ def stock_overview(symbol):
     prices = data.get("prices", [])
 
     return render_template("overview.html", info=info, timestamps=timestamps, prices=prices)
+
+
+
+
+
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=5001)

@@ -39,7 +39,10 @@ class Transactions(Resource):
     def get(self):
         db = connect_to_database()
         cursor = db.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM portfolio")
+        cursor.execute("""
+                       SELECT transactions.*, stocks.symbol, stocks.company_name
+                       FROM transactions JOIN stocks ON transactions.stock_id = stocks.stock_id; 
+                       """)
         portfolio = cursor.fetchall()
         cursor.close()
         return jsonify(portfolio)
@@ -47,7 +50,6 @@ class Transactions(Resource):
 
     def post(self):
         data = request.get_json()
-
         try:
             db = connect_to_database()
             cursor = db.cursor()
@@ -57,10 +59,20 @@ class Transactions(Resource):
         except Exception as e:
             print(f"Error: {e}")
 
-
+class Companies(Resource):
+    def get(self):
+        db = connect_to_database()
+        cursor = db.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT stocks.stock_id, stocks.symbol, stocks.company_name, stocks.sector, SUM(quantity) as total FROM transactions JOIN stocks ON transactions.stock_id = stocks.stock_id GROUP BY symbol HAVING total > 0;
+        """)
+        stocks = cursor.fetchall()
+        cursor.close()
+        return jsonify(stocks)
 
 api.add_resource(Stocks, '/api/stocks/<stock_id>', '/api/stocks')
 api.add_resource(Transactions, '/api/transactions')
+api.add_resource(Companies, '/api/companies')
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
