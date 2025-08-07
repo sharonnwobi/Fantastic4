@@ -8,6 +8,7 @@ app = Flask(__name__)
 
 @app.route("/stocks")
 def show_stocks():
+    # tab = request.args.get("tab")
     response = requests.get("http://localhost:5000/api/stocks")
     data = response.json()
     print(data)
@@ -99,6 +100,13 @@ def stock_overview(symbol):
     prices = data.get("prices", [])
 
     return render_template("overview.html", info=info, timestamps=timestamps, prices=prices)
+
+
+
+@app.route("/stocks", methods=["GET", "POST"])
+def portfolio_summary():
+    portfolio = requests.get("http://localhost:5000/api/transactions")
+    portfolio = portfolio.json()
 
 
 

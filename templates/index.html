@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% block title %}Stock List{% endblock %}
-
 {% block content %}
 <h2>Stock Portfolio</h2>
 <p>My stocks</p>
@@ -85,4 +84,8 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 </script>
 
+{% endblock %}
+
+{% block sidebar %}
+    {% include "sidebar.html" %}
 {% endblock %}
