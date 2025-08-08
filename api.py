@@ -126,7 +126,7 @@ class Overview(Resource):
 
         cursor.execute("""
                 SELECT 
-                    s.symbol AS stock_symbol,
+                    s.stock_id, s.symbol AS stock_symbol,
                     s.company_name,
                     SUM(t.quantity) AS quantity
                 FROM 

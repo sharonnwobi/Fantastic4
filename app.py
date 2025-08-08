@@ -92,18 +92,39 @@ def sell_stock():
 #     cursor.close()
 #     return redirect("/stocks")
 
-@app.route("/stocks/<symbol>")
-def stock_overview(symbol):
-    response = requests.get("http://localhost:5000/api/stocks/" + symbol)
-    if response.status_code != 200:
-        print(response.text)
-        return "Error fetching stock data", 500
-    data = response.json()
-    info = data.get("info", {})
-    timestamps = data.get("timestamps", [])
-    prices = data.get("prices", [])
+@app.route("/single_chartoverview", methods=["GET"])
+@app.route("/single_chartoverview/<symbol>", methods=["GET"])
+def stock_overview(symbol=None):
+    if symbol:
+        response = requests.get(f"http://localhost:5000/api/stocks/{symbol}")
+        if response.status_code != 200:
+            print(response.text)
+            return "Error fetching stock data", 500
+        data = response.json()
+        info = data.get("info", {})
+        timestamps = data.get("timestamps", [])
+        prices = data.get("prices", [])
+    else:
+        info = {}
+        timestamps = []
+        prices = []
 
-    return render_template("overview.html", info=info, timestamps=timestamps, prices=prices)
+    conn = connect_to_database()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT symbol FROM stocks")
+    rows = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    stock_list = [row["symbol"] for row in rows]
+    return render_template(
+        "singlechart_overview.html",
+        info=info,
+        timestamps=timestamps,
+        prices=prices,
+        stock_list=stock_list,
+        selected_symbol=symbol
+    )
 @app.route("/overview")
 def overview():
     # db = connect_to_database()

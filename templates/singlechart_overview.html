@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Stock Chart{% endblock %}
+
+{% block content %}
+<h2>Stock Chart</h2>
+
+<label for="symbolSelect">Select Stock:</label>
+<select id="symbolSelect" onchange="goToStock()">
+    <option value="">-- Select a stock --</option>
+    {% for s in stock_list %}
+        <option value="{{ s }}" {% if s == selected_symbol %}selected{% endif %}>{{ s }}</option>
+    {% endfor %}
+</select>
+
+<script>
+function goToStock() {
+    const symbol = document.getElementById('symbolSelect').value;
+    if (symbol) {
+        window.location.href = "/single_chartoverview/" + symbol;
+    } else {
+        window.location.href = "/single_chartoverview";
+    }
+}
+</script>
+
+{% if selected_symbol %}
+    <h3>{{ info['longName'] }} ({{ info['symbol'] }})</h3>
+    <p>Sector: {{ info['sector'] }} | Country: {{ info['country'] }}</p>
+    <p>Current Price: <strong>{{ info['currentPrice'] }}</strong></p>
+    <span style="display:none" id="timestamps">{{ timestamps | tojson }}</span>
+    <span style="display:none" id="prices">{{ prices | tojson }}</span>
+    <canvas id="priceChart" width="800" height="400"></canvas>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+    const timestampsData = JSON.parse(document.getElementById('timestamps').textContent);
+    const pricesData = JSON.parse(document.getElementById('prices').textContent);
+
+    const ctx = document.getElementById('priceChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: timestampsData,
+            datasets: [{
+                label: 'Price (USD)',
+                data: pricesData,
+                borderColor: '#3498db',
+                backgroundColor: 'rgba(52, 152, 219, 0.1)'
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: { title: { display: true, text: 'Time' }},
+                y: { title: { display: true, text: 'Price (USD)' }}
+            }
+        }
+    });
+    </script>
+
+{% endif %}
+{% endblock %}
