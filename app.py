@@ -60,26 +60,26 @@ def sell_stock():
         stock["current_price"] = get_stock_current_price(stock["symbol"])
     return render_template("sell.html", stock_options=stock_options)
 
-@app.route("/stocks/edit/<int:stock_id>", methods=["GET", "POST"])
-def edit_stock(stock_id):
-    db = connect_to_database()
-    cursor = db.cursor(dictionary=True)
-    if request.method == "POST":
-        symbol = request.form["symbol"]
-        name = request.form["company_name"]
-        sector = request.form["sector"]
-        cursor.execute(
-            "UPDATE stocks SET symbol=%s, company_name=%s, sector=%s WHERE stock_id=%s",
-            (symbol, name, sector, stock_id)
-        )
-        db.commit()
-        cursor.close()
-        return redirect("/stocks")
-    else:
-        cursor.execute("SELECT * FROM stocks WHERE stock_id = %s", (stock_id,))
-        stock = cursor.fetchone()
-        cursor.close()
-        return render_template("edit.html", stock=stock)
+# @app.route("/stocks/edit/<int:stock_id>", methods=["GET", "POST"])
+# def edit_stock(stock_id):
+#     db = connect_to_database()
+#     cursor = db.cursor(dictionary=True)
+#     if request.method == "POST":
+#         symbol = request.form["symbol"]
+#         name = request.form["company_name"]
+#         sector = request.form["sector"]
+#         cursor.execute(
+#             "UPDATE stocks SET symbol=%s, company_name=%s, sector=%s WHERE stock_id=%s",
+#             (symbol, name, sector, stock_id)
+#         )
+#         db.commit()
+#         cursor.close()
+#         return redirect("/stocks")
+#     else:
+#         cursor.execute("SELECT * FROM stocks WHERE stock_id = %s", (stock_id,))
+#         stock = cursor.fetchone()
+#         cursor.close()
+#         return render_template("edit.html", stock=stock)
 
 # @app.route("/stocks/delete/<int:stock_id>")
 # def delete_stock(stock_id):
@@ -106,25 +106,27 @@ def stock_overview(symbol):
     return render_template("overview.html", info=info, timestamps=timestamps, prices=prices)
 @app.route("/overview")
 def overview():
-    db = connect_to_database()
-    cursor = db.cursor(dictionary=True)
+    # db = connect_to_database()
+    # cursor = db.cursor(dictionary=True)
+    #
+    # cursor.execute("""
+    #     SELECT
+    #         s.symbol AS stock_symbol,
+    #         s.company_name,
+    #         SUM(t.quantity) AS quantity
+    #     FROM
+    #         transactions t
+    #     JOIN
+    #         stocks s ON t.stock_id = s.stock_id
+    #     GROUP BY
+    #         s.symbol, s.company_name
+    #     HAVING
+    #         quantity > 0
+    # """)
+    # results = cursor.fetchall()
 
-    cursor.execute("""
-        SELECT 
-            s.symbol AS stock_symbol,
-            s.company_name,
-            SUM(t.quantity) AS quantity
-        FROM 
-            transactions t
-        JOIN 
-            stocks s ON t.stock_id = s.stock_id
-        GROUP BY 
-            s.symbol, s.company_name
-        HAVING 
-            quantity > 0
-    """)
-    results = cursor.fetchall()
 
+    results = requests.get("http://localhost:5000/api/overview")
     portfolio_data = []
     total_value = 0
     top_stock = None
@@ -147,6 +149,7 @@ def overview():
 
         portfolio_data.append(stock_data)
     pf_data = requests.get("http://localhost:5000/api/sidebar")
+
     pf_data = pf_data.json()
 
     return render_template("overview.html",
