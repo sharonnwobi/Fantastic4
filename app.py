@@ -126,7 +126,7 @@ def overview():
     # results = cursor.fetchall()
 
 
-    results = requests.get("http://localhost:5000/api/overview")
+    results = requests.get("http://localhost:5000/api/overview").json()
     portfolio_data = []
     total_value = 0
     top_stock = None
