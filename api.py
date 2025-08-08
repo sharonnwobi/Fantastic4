@@ -95,26 +95,6 @@ class Transactions(Resource):
             print(f"Error: {e}")
 
 
-    # def get(self):
-    #     #data = request.get_json()
-    #     try:
-    #         db = connect_to_database()
-    #         cursor = db.cursor()
-    #         query = ("SELECT s.stock_id, s.symbol, SUM(t.price) AS total_price, SUM(t.quantity) AS total_quantity FROM transactions t JOIN stocks s ON  s.stock_id = t.stock_id GROUP BY s.symbol")
-    #         cursor.execute(query)
-    #         results = cursor.fetchall()
-    #         cursor.close()
-    #         #return results
-    #         return jsonify(results)
-    #     except Exception as e:
-    #         print(f"Error: {e}")
-
-
-        # finally:
-        #     db.rollback()
-
-
-
 class Companies(Resource):
     def get(self):
         db = connect_to_database()
