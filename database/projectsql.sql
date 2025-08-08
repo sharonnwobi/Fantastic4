@@ -14,12 +14,10 @@ CREATE TABLE stocks (
 ALTER TABLE stocks AUTO_INCREMENT=1000;
 
 CREATE TABLE transactions (
-    -- portfolio_id INT PRIMARY KEY AUTO_INCREMENT,-- is a portfolio_id needed if we are only having unique stock id?
-    -- upon entry, logic dhould check if user holds a stock in porfolio, if yes, then a row modification is made based on stock_id
-    -- IF NO, then a new row is entered: use SYMBOL from user input to find mathcung stock_id on stocks table, then insert into portolo with relevant quantities.
-    -- Note: if adding new row, only two fields are needed in logic, call stored proceedure
-    
-    stock_id INT, -- cannot be primary key 
+    -- use SYMBOL from user input to find matching stock_id on stocks table, then insert into transactions.
+    -- Note: if adding new row, only two fields are needed in logic, call stored procedure
+
+    stock_id INT, -- cannot be primary key
     price DOUBLE NOT NULL,
     quantity DECIMAL(12, 2) NOT NULL,
     transaction_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -35,8 +33,6 @@ timestamp_hist DATETIME,
 FOREIGN KEY (stock_id) REFERENCES stocks(stock_id) ON DELETE CASCADE
  -- Create trigger to auto remove history based on portfolio: link histtory to portfolio
 );
-
-
 
 -- STORED PROCEEDURE for stocks --
 USE stocks_sproc
@@ -89,11 +85,7 @@ DELIMITER ;
 -- TO ENTER DATA WRITE: CALL history_sproc(APPL, 20.49)
 
 
-
-
-
-		-- POPULATING STOCKS AND PORTFOLIO TABLES, history needs live data.
-
+-- POPULATING STOCKS AND PORTFOLIO TABLES
 CALL stocks_sproc('AAPL', 'Apple Inc.', 'Technology');
 CALL stocks_sproc('GOOGL', 'Alphabet Inc.', 'Technology');
 CALL stocks_sproc('AMZN', 'Amazon.com, Inc.', 'Consumer Discretionary');
@@ -104,6 +96,16 @@ CALL stocks_sproc('NFLX', 'Netflix, Inc.', 'Communication Services');
 CALL stocks_sproc('NVDA', 'NVIDIA Corporation', 'Technology');
 CALL stocks_sproc('PFE', 'Pfizer Inc.', 'Healthcare');
 CALL stocks_sproc('KO', 'The Coca-Cola Company', 'Consumer Staples');
+CALL stocks_sproc('BAC', 'Bank of America Corporation', 'Financial');
+CALL stocks_sproc('DIS', 'The Walt Disney Company', 'Communication Services');
+CALL stocks_sproc('INTC', 'Intel Corporation', 'Technology');
+CALL stocks_sproc('V', 'Visa Inc.', 'Financial');
+CALL stocks_sproc('WMT', 'Walmart Inc.', 'Consumer Staples');
+CALL stocks_sproc('CSCO', 'Cisco Systems, Inc.', 'Technology');
+CALL stocks_sproc('BA', 'The Boeing Company', 'Industrial');
+CALL stocks_sproc('XOM', 'Exxon Mobil Corporation', 'Energy');
+CALL stocks_sproc('ADBE', 'Adobe Inc.', 'Technology');
+CALL stocks_sproc('MCD', "McDonald's Corporation", 'Consumer Discretionary');
 
 SELECT * FROM transactions;
 SELECT s.symbol, SUM(t.price) AS total_price, SUM(t.quantity) AS total_quantity FROM transactions t JOIN stocks s ON  s.stock_id = t.stock_id GROUP BY s.symbol;
