@@ -112,6 +112,7 @@ def overview():
         total_value += total
 
         stock_data = {
+            "stock_id": row["stock_id"],
             "symbol": row["stock_symbol"],
             "company_name": row["company_name"],
             "quantity": row["quantity"],
