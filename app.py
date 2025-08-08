@@ -62,8 +62,10 @@ def sell_stock():
         return redirect("/stocks")
 
     stock_options = requests.get("http://localhost:5000/api/companies")
-
     stock_options = stock_options.json()
+
+    portfolio_data = requests.get("http://localhost:5000/api/sidebar").json()
+    
     for stock in stock_options:
         stock["current_price"] = get_stock_current_price(stock["symbol"])
     stock_id = request.args.get("stock_id")
@@ -90,12 +92,10 @@ def stock_overview(symbol=None):
         timestamps = []
         prices = []
 
-    conn = connect_to_database()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT symbol FROM stocks")
-    rows = cursor.fetchall()
-    cursor.close()
-    conn.close()
+    rows = requests.get("http://localhost:5000/api/symbol").json()
+
+    portfolio_data = requests.get("http://localhost:5000/api/sidebar")
+    portfolio_data = portfolio_data.json()
 
     stock_list = [row["symbol"] for row in rows]
     return render_template(
@@ -104,6 +104,7 @@ def stock_overview(symbol=None):
         timestamps=timestamps,
         prices=prices,
         stock_list=stock_list,
+        portfolio_data=portfolio_data,
         selected_symbol=symbol
     )
 @app.route("/overview")

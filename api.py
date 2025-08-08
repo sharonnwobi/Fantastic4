@@ -136,6 +136,17 @@ class Overview(Resource):
 class SideBar(Resource):
     def get(self):
         return jsonify(view_portfolio())
+    
+class Symbol(Resource):
+      def get(self):
+        conn = connect_to_database()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT symbol FROM stocks")
+        rows = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return jsonify(rows)
+          
 
 api.add_resource(Stocks, '/api/stocks/<stock_id>', '/api/stocks')
 api.add_resource(Transactions, '/api/transactions')
@@ -143,6 +154,7 @@ api.add_resource(Companies, '/api/companies')
 api.add_resource(Dashboard, '/api/dashboard')
 api.add_resource(Sidebar, '/api/sidebar')
 api.add_resource(Overview, '/api/overview')
+api.add_resource(Symbol, '/api/symbol')
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

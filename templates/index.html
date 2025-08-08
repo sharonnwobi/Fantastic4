@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>Stock Portfolio</h2>
 
 <span id="stocks-data" style="display: none;">{{ stocks | tojson }}</span>
 <span id="history-data" style="display: none;">{{ history | tojson }}</span>
@@ -23,7 +22,7 @@
       <option value="1440">24 Hours</option>
     </select>
 
-    <canvas id="portfolioChart" width="800" height="400"></canvas>
+    <canvas id="portfolioChart" width="800" height="600"></canvas>
   </div>
 </div>
 <table>
@@ -35,14 +34,14 @@
   <tr>
     {% for stock in stocks %}
     <td>{{ stock[1] }}</td>
-    <td>{{ stock[2] }}</td>
-    <td>{{ stock[3] }}</td>
+    <td>${{ '%0.2f' | format(stock[2]) }}</td>
+    <td>{{ stock[3]| int }}</td>
   </tr>
   {% endfor %}
   <tr>
     <td><strong>Total</strong></td>
-    <td><strong>{{ total_price }}</strong></td>
-    <td><strong>{{ total_quantity }}</strong></td>
+    <td><strong>${{ '%0.2f' | format(total_price) }}</strong></td>
+    <td><strong>{{ '%d' | format(total_quantity) }}</strong></td>
   </tr>
 </table>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -82,10 +81,20 @@
         }]
       },
       options: {
+        plugins: {
+          legend: {
+            labels: {
+              color: "#FFFFFF"
+            }
+          }, 
+        },
         responsive: true,
         scales: {
-          x: { ticks: { autoSkip: true, maxTicksLimit: 15 } },
-          y: { beginAtZero: false, title: { display: true, text: 'USD ($)' } }
+          x: { ticks: { autoSkip: true, maxTicksLimit: 7, color:"#FFFFFF", callback: function(value, index, ticks) {
+            let date = new Date(this.getLabelForValue(value));
+            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          } } },
+          y: { beginAtZero: false, ticks:{color:"#FFFFFF"},title: { display: true, text: 'USD ($)', color:"#FFFFFF" } }
         }
       }
     });
@@ -128,14 +137,19 @@
         plugins: {
           legend: {
             position: 'top',
-            labels: {
-              color: '#ff0000' // piros szöveg
+            labels:{
+              color: '#FFFFFF'
             }
           },
           title: {
             display: true,
             text: 'Portfolio Distribution by Stock',
-            color: '#00ff00' // a cím színe
+            font: {
+              size: 16,
+              family: 'Arial',
+              weight: 'normal',
+            },
+            color: '#FFFFFF'
           }
         }
       }

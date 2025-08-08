@@ -1,13 +1,13 @@
 :root {
-  --bg: #2a4aa1;
-  --primary: #2a4aa1;
+  --bg: rgba(23, 29, 47);
+  --primary: rgba(3, 10, 31);
   --accent: #3498db;
   --danger: #e74c3c;
-  --light: #ecf0f1;
-  --text: #2d3436;
+  --light: rgba(3, 10, 31);
+  --text: #FFFFFF;
   --radius: 8px;
   --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  --font: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  --font: Roboto, sans-serif;
 }
 
 * {
@@ -30,12 +30,29 @@ header, footer {
 }
 
 header {
-  text-align: left;
+  text-align: center;
+}
+
+header h1 {
+  color: white;
+  text-decoration: none;
+  font-weight: 10;
+  letter-spacing: 0.5px;
+  font-size: x-large;
+  margin: 10;
 }
 
 header h1 a {
   color: white;
   text-decoration: none;
+  font-weight: 10;
+  letter-spacing: 0.5px;
+  font-size: x-large;
+  margin: 0;
+}
+
+header h1 a:hover{
+    text-decoration: none;
 }
 
 .title {
@@ -44,14 +61,14 @@ header h1 a {
 
 .layout {
   display: flex;
-  min-height: 80vh;
+  min-height: 80;
 }
 
 .sidebar {
   width: 350px;
-  background-color: var(--primary);
+  background-color: rgba(41,47,64);
   color: white;
-  padding: 2rem 1rem;
+  padding: 0.5rem 1rem;
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
 }
 
@@ -64,12 +81,13 @@ header h1 a {
 .sidebar li {
   margin-bottom: 1rem;
   text-align: left;
+  margin-left: 0.5rem;
 }
 
 .sidebar a {
   color: white;
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 10;
 }
 
 .sidebar a:hover {
@@ -78,22 +96,30 @@ header h1 a {
 
 .content {
   flex: 1;
-  padding: 2rem;
+  padding: 0.5rem 2rem;
 }
 
 main {
   max-width: unset;
   margin: 0;
-  background: white;
+  background: var(--bg);
   border-radius: 0;
   box-shadow: none;
 }
 
 
 h2 {
-  color: var(--primary);
+  color: var(--text);
   margin-bottom: 1.2rem;
+  font-weight: lighter;
 }
+
+h3 {
+  color: var(--text);
+  margin-bottom: 0 rem;
+  font-weight: lighter;
+}
+
 
 table {
   width: 100%;
@@ -105,14 +131,22 @@ table thead {
   background-color: var(--light);
 }
 
+hr {
+  border: none;
+  height: 1px;
+  background-color: rgba(91, 97, 119);
+  margin: 1rem 0;
+}
+
 table th, table td {
   padding: 12px;
   border-bottom: 1px solid #ccc;
   text-align: left;
+  font-weight: 10;
 }
 
 table tr:hover {
-  background-color: #f0f0f0;
+  background-color: rgba(23, 29, 47, 0.5);
 }
 
 form label {
@@ -127,6 +161,8 @@ form input[type="text"], form input[type="number"],select, #search {
   margin-top: 5px;
   border: 1px solid #ccc;
   border-radius: var(--radius);
+  background-color: var(--bg);
+  color: var(--text)
 }
 
 button {
@@ -161,13 +197,13 @@ a:hover {
 }
 
 canvas {
-  max-width: 45%;
-  max-height: 400px;
+  max-width: 40%;
+  max-height: 350px;
   height: auto;
 }
 
 .linecharts {
-  max-width: 45%;
+  max-width: 50%;
 }
 
 .linecharts canvas {
@@ -176,11 +212,8 @@ canvas {
 
 .charts {
   display: flex;
-  justify-content: right;
-  align-items: right;
+  justify-content: center;
+  align-items: center;
   margin-top: 20px;
 }
 
-#priceChart {
-  max-width:100% !important;
-}
