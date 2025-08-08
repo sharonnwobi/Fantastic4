@@ -80,6 +80,7 @@ def edit_stock(stock_id):
         stock = cursor.fetchone()
         cursor.close()
         return render_template("edit.html", stock=stock)
+
 # @app.route("/stocks/delete/<int:stock_id>")
 # def delete_stock(stock_id):
 #     db = connect_to_database()
