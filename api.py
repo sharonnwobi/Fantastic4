@@ -10,6 +10,8 @@ from database.connection import process_history
 from database.connection import view_portfolio
 from database.connection import get_all_transactions
 from database.connection import calculate_portfolio_value_over_time
+from database.connection import generate_time_grid
+from database.connection import get_symbols_for_window
 
 app = Flask("api")
 api = Api(app)
@@ -31,11 +33,14 @@ class Dashboard(Resource):
         data = view_portfolio()
         transactions = get_all_transactions()
 
-        filtered_history = []
-        for stock in data:
-            stock_id = stock[0]
-            symbol = stock[1]
+        grid_dt = generate_time_grid(minutes_step=5)
+        grid_labels = [dt.strftime('%Y-%m-%d %H:%M') for dt in grid_dt]
+        start_time = grid_dt[0]
 
+        chart_symbols = get_symbols_for_window(start_time)
+
+        filtered_history = []
+        for stock_id, symbol in chart_symbols:
             last_timestamp = get_last_timestamp_for_stock(symbol)
             datetime_now = datetime.now()
             period = "1d" if last_timestamp and (datetime_now - last_timestamp).days < 1 else "5d"
@@ -49,13 +54,17 @@ class Dashboard(Resource):
                 "history": processed
             })
 
-        portfolio_over_time = calculate_portfolio_value_over_time(filtered_history, transactions)
+        portfolio_over_time = calculate_portfolio_value_over_time(
+            filtered_history, transactions, grid_dt
+        )
 
         return jsonify({
             "stocks": data,
             "history": filtered_history,
-            "portfolioHistory": portfolio_over_time  # új!
+            "portfolioHistory": portfolio_over_time,
+            "portfolioLabels": grid_labels
         })
+
 class Sidebar(Resource):
     def get(self):
         return jsonify(view_portfolio())

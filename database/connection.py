@@ -1,7 +1,9 @@
 import mysql.connector
 from config import HOST, USER, PASSWORD
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
+import pytz
 
+local_tz = pytz.timezone("Europe/Budapest")
 
 def connect_to_database():
     mydb = mysql.connector.connect(
@@ -126,37 +128,102 @@ def get_all_transactions():
         return result
     except Exception as e:
         print(e)
+        
+def get_symbols_for_window(start_time):
+    conn = connect_to_database()
+    cursor = conn.cursor()
 
-def calculate_portfolio_value_over_time(filtered_history, transactions):
+    query = """
+    SELECT s.stock_id, s.symbol
+    FROM transactions t
+    JOIN stocks s ON s.stock_id = t.stock_id
+    GROUP BY s.stock_id, s.symbol
+    HAVING SUM(t.quantity) > 0
+
+    UNION
+
+    SELECT DISTINCT s.stock_id, s.symbol
+    FROM transactions t
+    JOIN stocks s ON s.stock_id = t.stock_id
+    WHERE t.transaction_date >= %s
+    """
+    cursor.execute(query, (start_time,))
+    rows = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return rows
+
+
+def parse_history_to_dt_map(history_timestamps, history_prices):
+    dt_map = {}
+    for ts_str, price in zip(history_timestamps, history_prices):
+        dt_utc = datetime.strptime(ts_str, '%Y-%m-%d %H:%M').replace(tzinfo=timezone.utc)
+        dt_map[dt_utc] = float(price)
+    return dt_map
+
+
+def calculate_portfolio_value_over_time(filtered_history, transactions, grid_dt, tz=timezone.utc):
     if not filtered_history:
         return []
 
-    timestamps = filtered_history[0]['history']['timestamps']
-    portfolio_value = [0.0] * len(timestamps)
+    portfolio_value = [0.0] * len(grid_dt)
 
     for stock in filtered_history:
         stock_id = stock['stock_id']
         prices = stock['history']['prices']
-        stock_timestamps = [datetime.strptime(ts, '%Y-%m-%d %H:%M') for ts in stock['history']['timestamps']]
+        ts_strs = stock['history']['timestamps']
 
-        print(stock_timestamps, prices)
+        price_map = parse_history_to_dt_map(ts_strs, prices)
+
         stock_transactions = sorted(
             [t for t in transactions if t['stock_id'] == stock_id],
             key=lambda t: t['timestamp']
         )
 
-        quantity_over_time = []
-        current_quantity = 0
-        tx_index = 0
+        stock_transactions = [
+            dict(
+                t,
+                timestamp=(
+                    t['timestamp'].astimezone(tz)
+                    if t['timestamp'].tzinfo
+                    else local_tz.localize(t['timestamp']).astimezone(tz)
+                )
+            )
+            for t in stock_transactions
+        ]
 
-        for ts in stock_timestamps:
-            while tx_index < len(stock_transactions) and stock_transactions[tx_index]['timestamp'] <= ts:
-                current_quantity += stock_transactions[tx_index]['quantity']
+
+        quantity_over_time = []
+        current_quantity = 0.0
+        tx_index = 0
+        n_tx = len(stock_transactions)
+
+        last_price = None
+
+        for i, ts in enumerate(grid_dt):
+            while tx_index < n_tx and stock_transactions[tx_index]['timestamp'] <= ts:
+                current_quantity += float(stock_transactions[tx_index]['quantity'])
                 tx_index += 1
 
             quantity_over_time.append(current_quantity)
 
-        for i in range(len(portfolio_value)):
-            portfolio_value[i] += prices[i] * quantity_over_time[i]
+            if ts in price_map:
+                last_price = price_map[ts]
+            price_here = last_price if last_price is not None else 0.0
+
+            portfolio_value[i] += price_here * current_quantity
 
     return [round(v, 2) for v in portfolio_value]
+
+def generate_time_grid(minutes_step=5, tz=timezone.utc):
+    now = datetime.now(tz)
+    end_time = now.replace(second=0, microsecond=0)
+    start_time = end_time - timedelta(days=1)
+
+    grid = []
+    t = start_time
+    step = timedelta(minutes=minutes_step)
+    while t <= end_time:
+        grid.append(t)
+        t += step
+    return grid

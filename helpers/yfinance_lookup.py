@@ -6,7 +6,7 @@ def get_stock_info(symbol):
 
     try:
         info = stock.info
-        history = stock.history(period="1d", interval="5m")
+        history = stock.history(period="1d", interval="1m")
     except Exception as e:
         return f"Error fetching stock data: {e}", 500
 
@@ -27,17 +27,16 @@ def get_stock_current_price(symbol):
         return f"Error fetching current price: {e}", 500
     return current_price
 
-def get_stock_history(symbol, period="1d", interval="5m"):
+def get_stock_history(symbol, period="1d", interval="1m"):
     stock = yf.Ticker(symbol)
-    try:
-        history = stock.history(period=period, interval=interval)
-    except Exception as e:
-        return f"Error fetching stock history: {e}", 500
+    history = stock.history(period=period, interval=interval)
 
-    timestamps = history.index.strftime('%Y-%m-%d %H:%M').tolist()
+    idx = history.index
+    if idx.tz is None:
+        idx = idx.tz_localize("US/Eastern")
+    idx = idx.tz_convert("UTC")
+
+    timestamps = idx.strftime('%Y-%m-%d %H:%M').tolist()
     prices = history["Close"].fillna(method="ffill").tolist()
-    
-    return {
-        "timestamps": timestamps,
-        "prices": prices
-    }
+
+    return {"timestamps": timestamps, "prices": prices}
