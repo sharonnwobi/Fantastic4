@@ -1,0 +1,170 @@
+:root {
+  --bg: #f5f7fa;
+  --primary: #2a4aa1;
+  --accent: #3498db;
+  --danger: #e74c3c;
+  --light: #ecf0f1;
+  --text: #2d3436;
+  --radius: 8px;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --font: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font);
+  background-color: var(--bg);
+  color: var(--text);
+  margin: 0;
+  padding: 0;
+}
+
+header, footer {
+  background-color: var(--primary);
+  color: white;
+  padding: 1rem 2rem;
+  text-align: center;
+}
+
+header {
+  text-align: left;
+}
+
+header h1 a {
+  color: white;
+  text-decoration: none;
+}
+
+.layout {
+  display: flex;
+  min-height: 80vh;
+}
+
+.sidebar {
+  width: 350px;
+  background-color: var(--primary);
+  color: white;
+  padding: 2rem 1rem;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar li {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.sidebar a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.sidebar a:hover {
+  text-decoration: underline;
+}
+
+.content {
+  flex: 1;
+  padding: 2rem;
+}
+
+main {
+  max-width: unset;
+  margin: 0;
+  background: white;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+
+h2 {
+  color: var(--primary);
+  margin-bottom: 1.2rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+table thead {
+  background-color: var(--light);
+}
+
+table th, table td {
+  padding: 12px;
+  border-bottom: 1px solid #ccc;
+  text-align: left;
+}
+
+table tr:hover {
+  background-color: #f0f0f0;
+}
+
+form label {
+  display: block;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+form input[type="text"], form select, form input[type="number"] {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: var(--radius);
+}
+
+button {
+  padding: 10px 16px;
+  background-color: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+button:hover {
+  background-color: #2980b9;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.actions a {
+  margin-right: 10px;
+}
+
+.actions a:last-child {
+  color: var(--danger);
+}
+
+canvas {
+  max-width: 750px;
+  max-height: 400px;
+  height: auto;
+}
+
+.charts {
+  display: flex;
+  justify-content: right;
+  align-items: right;
+  margin-top: 20px;
+}

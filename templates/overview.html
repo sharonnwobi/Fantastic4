@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Portfolio Overview</h2>
+
+
+<div style="margin-bottom: 20px;">
+    <p><strong>Total Portfolio Value:</strong> ${{ total_value }}</p>
+    <p><strong>Top Position:</strong> {{ top_stock.symbol }} ({{ top_stock.company_name }}) - ${{ top_stock.total_value }}</p>
+</div>
+
+
+<div style="margin-bottom: 20px;">
+    <label for="search">Search by symbol or company:</label>
+    <input type="text" id="search" onkeyup="filterTable()" placeholder="e.g. AAPL, Apple">
+</div>
+
+
+<table id="stockTable" border="1" cellpadding="8" cellspacing="0">
+    <thead>
+        <tr>
+            <th>Symbol</th>
+            <th>Company</th>
+            <th>Quantity</th>
+            <th>Current Price</th>
+            <th>Total Value</th>
+            <th>Buy</th>
+            <th>Sell</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for stock in portfolio %}
+        <tr>
+            <td>{{ stock.symbol }}</td>
+            <td>{{ stock.company_name }}</td>
+            <td>{{ stock.quantity }}</td>
+            <td>${{ stock.current_price }}</td>
+            <td>${{ stock.total_value }}</td>
+            <td><a href="{{ url_for('create_stock', stock_id=stock.stock_id) }}">Buy</a></td>
+            <td><a href="{{ url_for('sell_stock', stock_id=stock.stock_id) }}">Sell</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Szűrő script -->
+<script>
+function filterTable() {
+    var input = document.getElementById("search");
+    var filter = input.value.toUpperCase();
+    var table = document.getElementById("stockTable");
+    var tr = table.getElementsByTagName("tr");
+
+    for (var i = 1; i < tr.length; i++) {
+        var tdSymbol = tr[i].getElementsByTagName("td")[0];
+        var tdCompany = tr[i].getElementsByTagName("td")[1];
+        if (tdSymbol && tdCompany) {
+            var textSymbol = tdSymbol.textContent || tdSymbol.innerText;
+            var textCompany = tdCompany.textContent || tdCompany.innerText;
+            if (textSymbol.toUpperCase().indexOf(filter) > -1 || textCompany.toUpperCase().indexOf(filter) > -1) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+        }
+    }
+}
+</script>
+{% endblock %}

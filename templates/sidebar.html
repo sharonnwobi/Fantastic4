@@ -1,0 +1,50 @@
+{% block content %}
+
+  <div class="main-content">
+    <ul>
+        <li><a href="/stocks/create">Buy Stock</a></li>
+        <li><a href="/stocks/sell">Sell Stock</a></li>
+        <li><a href="/overview">Overview</a></li>
+    </ul>
+    <table id="myPortfolio">
+        <tr>
+            <th>Symbol</th>
+            <th>Price</th>
+            <th>Quantity</th>
+        </tr>
+
+        <thead>
+        <tbody>
+            {% for entry in portfolio_data %}
+            <tr>
+                <td>{{ entry[1] }}</td>
+                <td>{{ '%0.2f'| format(entry[2]|float) }}</td>
+                <td>{{ entry[3] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        </thead>
+    </table>
+  <script>
+      const maxRows =5;
+      const table = document.getElementById("myPortfolio")
+      const rows = table.tBodies[0].rows
+      for (let i = maxRows; i<rows.length; i++){
+          rows[i].style.display = "none";
+      }
+  </script>
+  </div>
+
+  <style>
+    #myPortfolio {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid #ddd;
+      margin-top: 30px;
+    }
+
+    #myPortfolio tr:hover {
+        background-color: #89b5bd;
+    }
+  </style>
+{% endblock %}

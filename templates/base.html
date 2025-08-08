@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Stock Manager{% endblock %}</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+
+  <header>
+    <div class="container">
+      <h1><a href="/stocks">Stock Manager</a></h1>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav class="sidebar">
+        {% include "sidebar.html" %}
+    </nav>
+
+    <main class="content">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2025 Flask Finance App</p>
+    </div>
+  </footer>
+
+</body>
+</html>

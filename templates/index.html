@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Stock Portfolio</h2>
+
+<span id="stocks-data" style="display: none;">{{ stocks | tojson }}</span>
+<span id="history-data" style="display: none;">{{ history | tojson }}</span>
+<span id="portfolio-history-data" style="display:none;">{{ portfolioHistory | tojson }}</span>
+<span id="portfolio-labels" style="display:none;">{{ portfolioLabels | tojson }}</span>
+
+
+<div class="charts">
+  <canvas id="pieChart" width="800" height="400"></canvas>
+  <div>
+
+    <canvas id="portfolioChart" width="800" height="400"></canvas>
+  </div>
+</div>
+<table>
+  <tr>
+    <th>Symbol</th>
+    <th>total_price</th>
+    <th>total_quantity</th>
+  </tr>
+  <tr>
+    {% for stock in stocks %}
+    <td>{{ stock[1] }}</td>
+    <td>{{ stock[2] }}</td>
+    <td>{{ stock[3] }}</td>
+  </tr>
+  {% endfor %}
+  <tr>
+    <td><strong>Total</strong></td>
+    <td><strong>{{ total_price }}</strong></td>
+    <td><strong>{{ total_quantity }}</strong></td>
+  </tr>
+</table>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const stocks = JSON.parse(document.getElementById("stocks-data").textContent);
+    const history = JSON.parse(document.getElementById("history-data").textContent);
+
+    const portfolioHistory = JSON.parse(document.getElementById("portfolio-history-data").textContent);
+    const labelsUtc = JSON.parse(document.getElementById("portfolio-labels").textContent);
+
+    const datesLocal = labelsUtc.map(s => {
+      const iso = s.replace(' ', 'T') + ':00Z';
+      return new Date(iso);
+    });
+
+    const fmt = new Intl.DateTimeFormat(navigator.language, {
+      hour12: false, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'
+    });
+
+    const labelsLocal = datesLocal.map(d => fmt.format(d));
+
+    const ctx = document.getElementById('portfolioChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labelsLocal,
+        datasets: [{
+          label: 'Portfolio Value Over Time',
+          data: portfolioHistory,
+          fill: false,
+          borderColor: 'rgb(75, 192, 192)',
+          tension: 0.1
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          x: { ticks: { autoSkip: true, maxTicksLimit: 15 } },
+          y: { beginAtZero: false, title: { display: true, text: 'USD ($)' } }
+        }
+      }
+    });
+
+
+
+    const pieData = {
+      labels: stocks.map(stock => stock[1]),
+      datasets: [{
+        label: 'Portfolio Distribution',
+        data: stocks.map(stock => parseFloat(stock[2])),
+        backgroundColor: [
+          'rgba(255, 99, 132, 0.8)',
+          'rgba(54, 162, 235, 0.8)',
+          'rgba(255, 206, 86, 0.8)',
+          'rgba(75, 192, 192, 0.8)',
+          'rgba(153, 102, 255, 0.8)',
+          'rgba(255, 159, 64, 0.8)',
+          'rgba(201, 203, 207, 0.8)',
+          'rgba(255, 99, 132, 0.8)',
+          'rgba(54, 162, 235, 0.8)',
+          'rgba(255, 206, 86, 0.8)'
+        ],
+        borderColor: [
+          'rgba(255, 99, 132, 1)',
+          'rgba(54, 162, 235, 1)',
+          'rgba(255, 206, 86, 1)',
+          'rgba(75, 192, 192, 1)',
+          'rgba(153, 102, 255, 1)'
+        ],
+        borderWidth: 1
+      }]
+    };
+    const pieCtx = document.getElementById('pieChart').getContext('2d');
+    new Chart(pieCtx, {
+      type: 'pie',
+      data: pieData,
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'top',
+          },
+          title: {
+            display: true,
+            text: 'Portfolio Distribution by Stock'
+          }
+        }
+      }
+    });
+  });
+</script>
+
+{% endblock %}
