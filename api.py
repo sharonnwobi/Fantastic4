@@ -119,6 +119,30 @@ class Companies(Resource):
 
 
 
+class Overview(Resource):
+    def get(self):
+        db = connect_to_database()
+        cursor = db.cursor(dictionary=True)
+
+        cursor.execute("""
+                SELECT 
+                    s.symbol AS stock_symbol,
+                    s.company_name,
+                    SUM(t.quantity) AS quantity
+                FROM 
+                    transactions t
+                JOIN 
+                    stocks s ON t.stock_id = s.stock_id
+                GROUP BY 
+                    s.symbol, s.company_name
+                HAVING 
+                    quantity > 0
+            """)
+        results = cursor.fetchall()
+        cursor.close()
+        return jsonify(results)
+
+
 
 class SideBar(Resource):
     def get(self):
@@ -129,6 +153,7 @@ api.add_resource(Transactions, '/api/transactions')
 api.add_resource(Companies, '/api/companies')
 api.add_resource(Dashboard, '/api/dashboard')
 api.add_resource(Sidebar, '/api/sidebar')
+api.add_resource(Overview, '/api/overview')
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
