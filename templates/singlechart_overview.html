@@ -50,9 +50,16 @@ function goToStock() {
         },
         options: {
             responsive: true,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: "#FFFFFF"
+                    }
+                }
+            },
             scales: {
-                x: { title: { display: true, text: 'Time' }},
-                y: { title: { display: true, text: 'Price (USD)' }}
+                x: { ticks: { color: "#FFFFFF" }, title: { display: true, text: 'Time', color: "#FFFFFF" }},
+                y: { ticks: { color: "#FFFFFF" },title: { display: true, text: 'Price (USD)', color: "#FFFFFF" }}
             }
         }
     });

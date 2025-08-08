@@ -55,10 +55,6 @@ header h1 a:hover{
     text-decoration: none;
 }
 
-.title {
-  margin: 10px;
-}
-
 .layout {
   display: flex;
   min-height: 80;
@@ -215,5 +211,9 @@ canvas {
   justify-content: center;
   align-items: center;
   margin-top: 20px;
+}
+
+#priceChart {
+  max-width: 100% !important;
 }
 
