@@ -11,12 +11,9 @@ app = Flask(__name__)
 def show_stocks():
     response = requests.get("http://localhost:5000/api/dashboard")
     data = response.json()
-    print("\n\n\n\nPortfolio history:")
-    print(data["portfolioHistory"])
-    print("\n\n\n\n")
     portfolio_data = requests.get("http://localhost:5000/api/sidebar")
     portfolio_data = portfolio_data.json()
-    rows = portfolio_data  # ez a lista
+    rows = portfolio_data
     total_price = sum(float(row[2]) for row in rows)
     total_quantity = sum(float(row[3]) for row in rows)
     return render_template("index.html", stocks=data["stocks"], history=data["history"], 
