@@ -108,7 +108,6 @@ def overview():
     db = connect_to_database()
     cursor = db.cursor(dictionary=True)
 
-    # Lekérdezés az aktuális portfólió kiszámítására
     cursor.execute("""
         SELECT 
             s.symbol AS stock_symbol,
@@ -130,7 +129,7 @@ def overview():
     top_stock = None
 
     for row in results:
-        price = get_stock_current_price(row["stock_symbol"])  # Pl. yfinance vagy más API
+        price = get_stock_current_price(row["stock_symbol"])
         total = float(row["quantity"]) * price
         total_value += total
 
