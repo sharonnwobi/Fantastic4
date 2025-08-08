@@ -23,6 +23,14 @@
 </form>
 
 <script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const stockId = "{{ stock_id }}";
+    if (stockId) {
+      const select = document.querySelector("select[name='stock_id']");
+      select.value = stockId;
+      fillFields(select);
+    }
+  });
   function fillFields(select) {
     const selected = select.options[select.selectedIndex];
     document.getElementById("company_name").value = selected.dataset.name;

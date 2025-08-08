@@ -11,16 +11,16 @@
 
 <div class="charts">
   <canvas id="pieChart" width="800" height="400"></canvas>
-  <div>
+  <div class="linecharts">
 
     <select id="timeRange">
-        <option value="All" selected>All</option>
-        <option value="5">5 minutes</option>
-        <option value="60">60 minutes</option>
-        <option value="180">3 Hours</option>
-        <option value ="360">6 Hours</option>
-        <option value ="720">12 Hours</option>
-        <option value="1440">24 Hours</option>
+      <option value="All" selected>All</option>
+      <option value="5">5 minutes</option>
+      <option value="60">60 minutes</option>
+      <option value="180">3 Hours</option>
+      <option value="360">6 Hours</option>
+      <option value="720">12 Hours</option>
+      <option value="1440">24 Hours</option>
     </select>
 
     <canvas id="portfolioChart" width="800" height="400"></canvas>
@@ -128,35 +128,39 @@
         plugins: {
           legend: {
             position: 'top',
+            labels: {
+              color: '#ff0000' // piros szöveg
+            }
           },
           title: {
             display: true,
-            text: 'Portfolio Distribution by Stock'
+            text: 'Portfolio Distribution by Stock',
+            color: '#00ff00' // a cím színe
           }
         }
       }
     });
-        function filteredData(range){
+    function filteredData(range) {
 
-            if(range === "All"){
-                return {labels:labelsLocal, data:portfolioHistory}
-            }
-            const now=new Date()
-            range*=60000
-            range+= 300000
-            const filtered = datesLocal.map((data, i)=>({date:data, label:labelsLocal[i], value:portfolioHistory[i]}))
-                .filter(datapoint => now-datapoint.date <= parseInt(range))
-            return {
-                labels:filtered.map(data=>data.label),
-                data:filtered.map(data=>data.value)
-            }
+      if (range === "All") {
+        return { labels: labelsLocal, data: portfolioHistory }
+      }
+      const now = new Date()
+      range *= 60000
+      range += 300000
+      const filtered = datesLocal.map((data, i) => ({ date: data, label: labelsLocal[i], value: portfolioHistory[i] }))
+        .filter(datapoint => now - datapoint.date <= parseInt(range))
+      return {
+        labels: filtered.map(data => data.label),
+        data: filtered.map(data => data.value)
+      }
 
-        }
-      document.getElementById("timeRange").addEventListener("change",function (){
-          const{labels,data} = filteredData(this.value)
-          chart.data.labels = labels
-          chart.data.datasets[0].data= data
-          chart.update()
+    }
+    document.getElementById("timeRange").addEventListener("change", function () {
+      const { labels, data } = filteredData(this.value)
+      chart.data.labels = labels
+      chart.data.datasets[0].data = data
+      chart.update()
 
     });
   });

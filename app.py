@@ -41,7 +41,11 @@ def create_stock():
     stock_options = stock_options.json()
     for stock in stock_options:
         stock["current_price"] = get_stock_current_price(stock["symbol"])
-    return render_template("create.html", stock_options=stock_options, portfolio_data=portfolio_data)
+        
+    stock_id = request.args.get("stock_id")
+    if not stock_id:
+        stock_id = None
+    return render_template("create.html", stock_options=stock_options, portfolio_data=portfolio_data, stock_id=stock_id)
 
 
 @app.route("/stocks/sell", methods=["GET", "POST"])
@@ -62,7 +66,10 @@ def sell_stock():
     stock_options = stock_options.json()
     for stock in stock_options:
         stock["current_price"] = get_stock_current_price(stock["symbol"])
-    return render_template("sell.html", stock_options=stock_options)
+    stock_id = request.args.get("stock_id")
+    if not stock_id:
+        stock_id = None
+    return render_template("sell.html", stock_options=stock_options, stock_id=stock_id)
 
 
 

@@ -17,7 +17,7 @@
     {% endfor %}
   </select></label><br>
   <label>Holdings: <b><span id="holdings"></span></b></label>
-  <label>Quantity: <input type="number" name="quantity" id = "quantity" min="0" onchange="calculatePrice()"></label><br>
+  <label>Quantity: <input type="number" name="quantity" id = "quantity" min="0" onchange="calculatePrice()" required></label><br>
   <label>Current price: <input type="text" name="price" id="current_price" readonly/><label><br>
     <label>Selling price:
     <input type="text" name="selling_price" id="selling_price" readonly>
@@ -28,6 +28,14 @@
 </form>
 
 <script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const stockId = "{{ stock_id }}";
+    if (stockId) {
+      const select = document.querySelector("select[name='stock_id']");
+      select.value = stockId;
+      fillFields(select);
+    }
+  });
   function fillFields(select) {
     const selected = select.options[select.selectedIndex];
     document.getElementById("current_price").value = selected.dataset.price;
