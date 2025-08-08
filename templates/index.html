@@ -13,14 +13,24 @@
   <canvas id="pieChart" width="800" height="400"></canvas>
   <div>
 
+    <select id="timeRange">
+        <option value="All" selected>All</option>
+        <option value="5">5 minutes</option>
+        <option value="60">60 minutes</option>
+        <option value="180">3 Hours</option>
+        <option value ="360">6 Hours</option>
+        <option value ="720">12 Hours</option>
+        <option value="1440">24 Hours</option>
+    </select>
+
     <canvas id="portfolioChart" width="800" height="400"></canvas>
   </div>
 </div>
 <table>
   <tr>
     <th>Symbol</th>
-    <th>total_price</th>
-    <th>total_quantity</th>
+    <th>Price</th>
+    <th>Quantity</th>
   </tr>
   <tr>
     {% for stock in stocks %}
@@ -37,6 +47,8 @@
 </table>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+
+
   document.addEventListener("DOMContentLoaded", function () {
     const stocks = JSON.parse(document.getElementById("stocks-data").textContent);
     const history = JSON.parse(document.getElementById("history-data").textContent);
@@ -56,7 +68,8 @@
     const labelsLocal = datesLocal.map(d => fmt.format(d));
 
     const ctx = document.getElementById('portfolioChart').getContext('2d');
-    new Chart(ctx, {
+
+    let chart = new Chart(ctx, {
       type: 'line',
       data: {
         labels: labelsLocal,
@@ -122,6 +135,29 @@
           }
         }
       }
+    });
+        function filteredData(range){
+
+            if(range === "All"){
+                return {labels:labelsLocal, data:portfolioHistory}
+            }
+            const now=new Date()
+            range*=60000
+            range+= 300000
+            const filtered = datesLocal.map((data, i)=>({date:data, label:labelsLocal[i], value:portfolioHistory[i]}))
+                .filter(datapoint => now-datapoint.date <= parseInt(range))
+            return {
+                labels:filtered.map(data=>data.label),
+                data:filtered.map(data=>data.value)
+            }
+
+        }
+      document.getElementById("timeRange").addEventListener("change",function (){
+          const{labels,data} = filteredData(this.value)
+          chart.data.labels = labels
+          chart.data.datasets[0].data= data
+          chart.update()
+
     });
   });
 </script>
