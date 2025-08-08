@@ -16,9 +16,13 @@
 
     {% endfor %}
   </select></label><br>
-  <span>Holdings: <b><span id="holdings"></span></b></span><br><br/>
-  <label>Quantity: <input type="number" name="quantity" id = "quantity"></label><br>
+  <label>Holdings: <b><span id="holdings"></span></b></label>
+  <label>Quantity: <input type="number" name="quantity" id = "quantity" min="0" onchange="calculatePrice()"></label><br>
   <label>Current price: <input type="text" name="price" id="current_price" readonly/><label><br>
+    <label>Selling price:
+    <input type="text" name="selling_price" id="selling_price" readonly>
+  </label><br>
+
 
   <button type="submit">Sell Stock</button>
 </form>
@@ -29,6 +33,14 @@
     document.getElementById("current_price").value = selected.dataset.price;
     document.getElementById("holdings").innerText = selected.dataset.quantity || 0;
     document.getElementById("quantity").max = selected.dataset.quantity || 1000;
+    calculatePrice();
+  }
+
+  function calculatePrice() {
+    const qty = parseFloat(document.getElementById("quantity").value) || 0;
+    const price = parseFloat(document.getElementById("current_price").value) || 0;
+    const total = qty * price;
+    document.getElementById("selling_price").value = total;
   }
 </script>
 
