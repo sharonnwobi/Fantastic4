@@ -165,6 +165,7 @@ def parse_history_to_dt_map(history_timestamps, history_prices):
 def calculate_portfolio_value_over_time(filtered_history, transactions, grid_dt, tz=timezone.utc):
     if not filtered_history:
         return []
+    
 
     portfolio_value = [0.0] * len(grid_dt)
 
@@ -206,11 +207,16 @@ def calculate_portfolio_value_over_time(filtered_history, transactions, grid_dt,
                 tx_index += 1
 
             quantity_over_time.append(current_quantity)
-
+            
+            
             if ts in price_map:
                 last_price = price_map[ts]
+            else:
+                if len(price_map) > 0:
+                    last_price = list(price_map.values())[-1]
+                else:
+                    last_price = None
             price_here = last_price if last_price is not None else 0.0
-
             portfolio_value[i] += price_here * current_quantity
 
     return [round(v, 2) for v in portfolio_value]

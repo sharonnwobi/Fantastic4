@@ -94,7 +94,7 @@
             let date = new Date(this.getLabelForValue(value));
             return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
           } } },
-          y: { beginAtZero: false, ticks:{color:"#FFFFFF"},title: { display: true, text: 'USD ($)', color:"#FFFFFF" } }
+          y: { beginAtZero: true, ticks:{color:"#FFFFFF"},title: { display: true, text: 'USD ($)', color:"#FFFFFF" } }
         }
       }
     });
