@@ -96,6 +96,7 @@ header h1 a:hover{
 }
 
 main {
+  min-height: 85vh;
   max-width: unset;
   margin: 0;
   background: var(--bg);
