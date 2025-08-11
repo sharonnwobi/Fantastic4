@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>{% block title %}Stock Manager{% endblock %}</title>
@@ -7,17 +8,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/static/styles.css">
 </head>
+
 <body>
 
   <header>
+    <div class="neon-wrapper">
+      <img class="logoimg" src="/static/f4logo_removed_bg.png" alt="Fantastic 4 Logo" class="logo">
+    </div>
     <div class="container">
-      <h1 class="title"><a href="/stocks">Stock Manager</a></h1>
+      <div class="title-container">
+        {% block header_title %}
+        <h1 class="title">Stock Manager</h1>
+        {% endblock %}
+      </div>
     </div>
   </header>
 
   <div class="layout">
     <nav class="sidebar">
-        {% include "sidebar.html" %}
+      {% include "sidebar.html" %}
     </nav>
 
     <main class="content">
@@ -32,4 +41,5 @@
   </footer>
 
 </body>
+
 </html>
