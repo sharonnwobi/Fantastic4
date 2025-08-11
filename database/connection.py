@@ -221,7 +221,7 @@ def calculate_portfolio_value_over_time(filtered_history, transactions, grid_dt,
 
     return [round(v, 2) for v in portfolio_value]
 
-def generate_time_grid(minutes_step=5, tz=timezone.utc):
+def generate_time_grid(minutes_step=1, tz=timezone.utc):
     now = datetime.now(tz)
     end_time = now.replace(second=0, microsecond=0)
     start_time = end_time - timedelta(days=1)
